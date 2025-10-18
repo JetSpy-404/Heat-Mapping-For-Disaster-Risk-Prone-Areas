@@ -1,0 +1,22 @@
+{
+"type": "FeatureCollection",
+"name": "storm_surge",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "HAZ": 1.0, "distance": 0.0, "angle": 223.04417546775989 }, "geometry": { "type": "Point", "coordinates": [ 124.480467183994762, 11.4629173410004 ] } },
+{ "type": "Feature", "properties": { "HAZ": 1.0, "distance": 1.0, "angle": 180.25870554644365 }, "geometry": { "type": "Point", "coordinates": [ 124.271105422436975, 11.574765739236536 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 0.0, "angle": 164.97775495101493 }, "geometry": { "type": "Point", "coordinates": [ 124.482931652792416, 11.457406919660729 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 1.0, "angle": 270.27973932954973 }, "geometry": { "type": "Point", "coordinates": [ 124.418250596946621, 11.534846087035476 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 2.0, "angle": 90.274675558331126 }, "geometry": { "type": "Point", "coordinates": [ 124.384702672283112, 11.60486379609644 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 3.0, "angle": 0.28013737011561679 }, "geometry": { "type": "Point", "coordinates": [ 124.349546045481787, 11.798349252900474 ] } },
+{ "type": "Feature", "properties": { "HAZ": 3.0, "distance": 0.0, "angle": 200.69038273281984 }, "geometry": { "type": "Point", "coordinates": [ 124.482945019152254, 11.457384085399669 ] } },
+{ "type": "Feature", "properties": { "HAZ": 3.0, "distance": 1.0, "angle": 180.28492756505122 }, "geometry": { "type": "Point", "coordinates": [ 124.403610148502167, 11.544870597212601 ] } },
+{ "type": "Feature", "properties": { "HAZ": 3.0, "distance": 2.0, "angle": 270.28140586494328 }, "geometry": { "type": "Point", "coordinates": [ 124.40765984418438, 11.701441526066757 ] } },
+{ "type": "Feature", "properties": { "HAZ": 1.0, "distance": 0.0, "angle": 135.30015880534262 }, "geometry": { "type": "Point", "coordinates": [ 124.508377771785575, 11.474600787135936 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 0.0, "angle": 135.30015880534262 }, "geometry": { "type": "Point", "coordinates": [ 124.508377771785575, 11.474600787135936 ] } },
+{ "type": "Feature", "properties": { "HAZ": 2.0, "distance": 0.0, "angle": 135.30015828323536 }, "geometry": { "type": "Point", "coordinates": [ 124.508377183628582, 11.474490040209817 ] } },
+{ "type": "Feature", "properties": { "HAZ": 3.0, "distance": 0.0, "angle": 135.30015828323536 }, "geometry": { "type": "Point", "coordinates": [ 124.508377183628582, 11.474490040209817 ] } },
+{ "type": "Feature", "properties": { "HAZ": 1.0, "distance": 0.0, "angle": 135.32286094147997 }, "geometry": { "type": "Point", "coordinates": [ 124.616235951954394, 11.519044617390817 ] } },
+{ "type": "Feature", "properties": { "HAZ": 3.0, "distance": 0.0, "angle": 135.32286094147997 }, "geometry": { "type": "Point", "coordinates": [ 124.616235951954394, 11.519044617390817 ] } }
+]
+}
