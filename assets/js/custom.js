@@ -9,19 +9,27 @@
         navbar: 'navbar-sticky', // navbar-sticky, navbar-floating, navbar-static
         semidark: false,
     };
-    window.addEventListener('load', function () {
-        // screen loader
-        const screen_loader = document.getElementsByClassName('screen_loader');
-        if (screen_loader?.length) {
-            screen_loader[0].classList.add('animate__fadeOut');
-            setTimeout(() => {
-                document.body.removeChild(screen_loader[0]);
-            }, 200);
-        }
+    function removeScreenLoaderImmediate(){
+        try{
+            const screen_loader = document.getElementsByClassName('screen_loader');
+            if (screen_loader?.length) {
+                screen_loader[0].classList.add('animate__fadeOut');
+                setTimeout(() => {
+                    if (screen_loader[0] && screen_loader[0].parentNode) document.body.removeChild(screen_loader[0]);
+                }, 200);
+            }
+        }catch(e){ console.error('removeScreenLoaderImmediate', e); }
+    }
 
-        // set rtl layout
-        Alpine.store('app').setRTLLayout();
+    // Remove loader as soon as DOM is ready so slow resources don't keep the page blocked.
+    document.addEventListener('DOMContentLoaded', removeScreenLoaderImmediate);
+
+    // Also keep the original load handler as a fallback
+    window.addEventListener('load', function () {
+        removeScreenLoaderImmediate();
     });
+
+    // (rtl layout will be set after Alpine initializes)
 
     // set current year in footer
     const yearEle = document.querySelector('#footer-year');

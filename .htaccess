@@ -1,0 +1,56 @@
+# Protect direct access to specific .html pages by redirecting to their PHP wrappers
+# Place this file in the project root (c:/xampp/htdocs/Final Thesis System/.htaccess)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # If the raw REQUEST_URI contains percent-encoded spaces (%20) and a protected HTML filename,
+  # block or redirect it explicitly. This helps when the site folder name contains spaces.
+  # If REQUEST_URI contains %20 and one of the protected names, return 403.
+  RewriteCond %{REQUEST_URI} %20 [OR]
+  RewriteCond %{REQUEST_URI} %25
+  RewriteCond %{REQUEST_URI} (dashboard|barangay|municipality_users|municipality|statistics|heatmap|hazard_types|hazard_data|chloropleth)\.html [NC]
+  RewriteRule ^ - [F,L]
+
+  # Redirect guarded HTML pages to their PHP wrappers
+  RewriteRule ^dashboard\.html$ /dashboard.php [R=302,L]
+  RewriteRule ^barangay\.html$ /barangay.php [R=302,L]
+  RewriteRule ^municipality_users\.html$ /municipality_users.php [R=302,L]
+  RewriteRule ^municipality\.html$ /municipality.php [R=302,L]
+  RewriteRule ^statistics\.html$ /statistics.php [R=302,L]
+  RewriteRule ^heatmap\.html$ /heatmap.php [R=302,L]
+  RewriteRule ^hazard_types\.html$ /hazard_types.php [R=302,L]
+  RewriteRule ^hazard_data\.html$ /hazard_data.php [R=302,L]
+  RewriteRule ^chloropleth\.html$ /chloropleth.php [R=302,L]
+
+  # Add more rules above for any additional guarded HTML pages
+</IfModule>
+
+# Parse .html through PHP in this directory so session checks embedded in .html will run.
+# Note: this makes Apache treat .html files as PHP within this folder only.
+<IfModule mod_php7.c>
+  AddHandler application/x-httpd-php .html
+</IfModule>
+<IfModule mod_php8.c>
+  AddHandler application/x-httpd-php .html
+</IfModule>
+
+# Prevent direct access to protected HTML files if rewrite isn't available or to be explicit.
+# Returns 403 for direct HTTP requests to these HTML files so only the PHP wrappers can serve them.
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(dashboard|barangay|municipality|municipality_users|statistics|heatmap|hazard_types|hazard_data|chloropleth)\.html$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+# Fallback for older Apache versions
+<IfModule !mod_authz_core.c>
+  <FilesMatch "^(dashboard|barangay|municipality|municipality_users|statistics|heatmap|hazard_types|hazard_data|chloropleth)\.html$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Use index.php as directory index and disable autoindex
+DirectoryIndex index.php
+Options -Indexes
