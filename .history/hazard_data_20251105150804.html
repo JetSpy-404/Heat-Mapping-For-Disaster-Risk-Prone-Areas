@@ -991,7 +991,6 @@
             if (data.success) {
                 Alpine.store('user', data.data);
                 updateUserDropdown(data.data);
-                updateSidebarRole(data.data.role);
             }
         } catch (err) {
             console.error('Failed to load user data:', err);
@@ -1013,23 +1012,6 @@
                 nameSpan.innerHTML = `${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>`;
             }
             if (emailA) emailA.textContent = user.email;
-        }
-    }
-
-    // Update the sidebar role display
-    function updateSidebarRole(role) {
-        const sidebarRoleElement = document.getElementById('sidebar-role');
-        if (sidebarRoleElement) {
-            // Capitalize the first letter of the role
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            sidebarRoleElement.textContent = displayRole;
-        }
-
-        // Also update the header role display
-        const headerRoleElement = document.getElementById('header-role');
-        if (headerRoleElement) {
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            headerRoleElement.textContent = displayRole;
         }
     }
 

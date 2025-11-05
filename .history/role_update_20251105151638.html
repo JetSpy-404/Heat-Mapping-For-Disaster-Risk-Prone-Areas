@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Update Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #sidebar {
+            width: 200px;
+            height: 100vh;
+            background-color: #f4f4f4;
+            padding: 20px;
+            box-sizing: border-box;
+            float: left;
+        }
+        #header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #header-role, #sidebar-role {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h3>Sidebar</h3>
+        <p>Role: <span id="sidebar-role">Administrator</span></p>
+    </div>
+    <div id="header">
+        <h2>Header</h2>
+        <p>Role: <span id="header-role">Administrator</span></p>
+    </div>
+
+    <script>
+        function updateSidebarRole(role) {
+            const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
+            document.getElementById('sidebar-role').textContent = capitalizedRole;
+            document.getElementById('header-role').textContent = capitalizedRole;
+        }
+
+        function loadUserData() {
+            // Simulate fetching user data (e.g., from an API)
+            // In a real application, this would be an AJAX call
+            const userData = {
+                role: 'administrator'  // Assuming the role comes in lowercase
+            };
+
+            // Call updateSidebarRole with the user's role after fetching data
+            updateSidebarRole(userData.role);
+        }
+
+        // Load user data on page load
+        window.onload = loadUserData;
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Hazard Data</title>
+        <title>Barangay</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/x-icon" href="favicon.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,50 +26,41 @@
 		.panel-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 		.icon-btn { background: none; border: none; padding: 4px; cursor: pointer; }
 
-		/* Notification Styles */
-		.notification {
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			background: #10b981;
-			color: white;
-			padding: 12px 16px;
-			border-radius: 8px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			z-index: 1000;
-			max-width: 300px;
-			font-size: 14px;
-			opacity: 0;
-			transform: translateY(-20px);
-			transition: all 0.3s ease;
-		}
-
-		.notification.show {
-			opacity: 1;
-			transform: translateY(0);
-		}
-
-		.notification.error {
-			background: #ef4444;
-		}
-
-		.notification.warning {
-			background: #f59e0b;
-		}
-
-		.notification .close-btn {
-			background: none;
-			border: none;
-			color: white;
-			font-size: 18px;
-			cursor: pointer;
-			margin-left: 8px;
-			opacity: 0.8;
-		}
-
-		.notification .close-btn:hover {
-			opacity: 1;
-		}
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .notification.success {
+            background-color: #10b981;
+        }
+        .notification.error {
+            background-color: #ef4444;
+        }
+        .notification.warning {
+            background-color: #f59e0b;
+        }
+        .notification .close-btn {
+            float: right;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 		</style>
     </head>
 
@@ -206,7 +197,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="hazard_data.php" class="active group">
+                                        <a href="hazard_data.php" class="group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M4.97883 9.68508C2.99294 8.89073 2 8.49355 2 8C2 7.50645 2.99294 7.10927 4.97883 6.31492L7.7873 5.19153C9.77318 4.39718 10.7661 4 12 4C13.2339 4 14.2268 4.39718 16.2127 5.19153L19.0212 6.31492C21.0071 7.10927 22 7.50645 22 8C22 8.49355 21.0071 8.89073 19.0212 9.68508L16.2127 10.8085C14.2268 11.6028 13.2339 12 12 12C10.7661 12 9.77318 11.6028 7.7873 10.8085L4.97883 9.68508Z" fill="currentColor"></path>
@@ -227,7 +218,7 @@
                             </h2>
 
                                     <li class="nav-item">
-                                        <a href="barangay.php" class="group">
+                                        <a href="barangay.php" class="active group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path opacity="0.5" d="M19.7165 20.3624C21.143 19.5846 22 18.5873 22 17.5C22 16.3475 21.0372 15.2961 19.4537 14.5C17.6226 13.5794 14.9617 13 12 13C9.03833 13 6.37738 13.5794 4.54631 14.5C2.96285 15.2961 2 16.3475 2 17.5C2 18.6525 2.96285 19.7039 4.54631 20.5C6.37738 21.4206 9.03833 22 12 22C15.1066 22 17.8823 21.3625 19.7165 20.3624Z" fill="currentColor"></path>
@@ -282,7 +273,7 @@
             <!-- end sidebar section -->
 
             <div class="main-content flex flex-col min-h-screen">
-                               <!-- start header section -->
+                                <!-- start header section -->
                 <header class="z-40" :class="{'dark' : $store.app.semidark && $store.app.menu === 'horizontal'}">
                     <div class="shadow-sm">
                         <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
@@ -476,7 +467,7 @@
                 <div x-data="finance">
                     <ul class="flex space-x-2 rtl:space-x-reverse">
                         <li>
-                            <a href="javascript:;" class="text-primary hover:underline">Hazard Data</a>
+                            <a href="javascript:;" class="text-primary hover:underline">Barangay</a>
                         </li>
                     </ul>
 					<div class="pt-5">
@@ -484,30 +475,28 @@
                     <div class="mb-5 overflow-x-auto">
                                 <div class="panel">
                                     <div class="top-bar">
-                                    <input id="searchInput" class="form-input" type="text" placeholder="Search hazards..." />
+                                    <input id="searchInput" class="form-input" type="text" placeholder="Search barangay..." />
                                     <button id="addBtn" class="add-btn">
                                         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                        Add Data
+                                        Add Barangay
                                     </button>
                                     </div>
 
                                     <div class="panel-table-wrapper">
-                    <table class="data-table table-responsive" aria-describedby="pageInfo">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Barangay</th>
-                                <th>Municipality</th>
-                                <th>Disaster Type</th>
-                                <th>Date</th>
-                                <th>Severity</th>
-                                <th>House Affected</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="panel" id="tableBody"></tbody>
-                    </table>
-                </div>
+                                    <table class="table-auto table-responsive" aria-describedby="pageInfo">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Barangay Code</th>
+                                                <th>Barangay Name</th>
+                                                <th>Municipality</th>
+                                                <th>Populations</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="panel" id="tableBody"></tbody>
+                                    </table>
+                                </div>
 
                             <div class="pagination">
                             <p id="pageInfo"></p>
@@ -519,41 +508,24 @@
                         </div>
 
                         <!-- Hazard Form Modal -->
-                        <div id="hazardModal" class="modal">
+                        <div id="barangayModal" class="modal">
                             <div class="modal-content">
-                            <h2 id="modalTitle">Add Data</h2>
+                            <h2 id="modalTitle">Add Barangay</h2>
                             <div class="form-group">
-                                <label for="barangay">Barangay</label>
-                                <select id="barangay" class="form-select">
-                                    <option value="" disabled selected>Select Barangay</option>
-                                </select>
-                            </div>
-                             <div class="form-group">
-                                <label for="municipality">Municipality</label>
-                                <select id="municipality" class="form-select">
-                                    <option value="" disabled selected>Select Municipality</option>
-                                </select>
+                                <label for="barangay_code">Barangay Code</label>
+                                <input id="barangay_code" type="text" />
                             </div>
                             <div class="form-group">
-                                <label for="disaster">Disaster Types</label>
-                                <select class="form-select" id="disaster" required>
-                                        <option value="" selected disabled>Select Disaster</option>
-                                        <option value="Geological">Landslide</option>
-                                        <option value="Hydrological">Floods</option>
-                                        <option value="Meteorological">Storm Surge</option>
-                                    </select>
+                                <label for="barangay_name">Barangay Name</label>
+                                <input id="barangay_name" type="text" />
                             </div>
                             <div class="form-group">
-                                <label for="date">Date</label>
-                                <input id="date" type="date" />
+                                <label for="municipality_id">Municipality</label>
+                                <select id="municipality_id"></select>
                             </div>
                             <div class="form-group">
-                                <label for="severity">Severity</label>
-                                <input id="severity" type="text" />
-                            </div>
-                            <div class="form-group">
-                                <label for="houseAffected">House Affected</label>
-                                <input id="houseAffected" type="text" />
+                                <label for="populations">Populations</label>
+                                <input id="population" type="text" />
                             </div>
                             <div class="modal-actions">
                                 <button id="cancelBtn" class="btn cancel">Cancel</button>
@@ -573,7 +545,7 @@
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                                 </svg>
                             </div>
-                            <h2>Delete Hazard</h2>
+                            <h2>Delete Barangay</h2>
                             <p class="delete-modal-text">Are you sure you want to delete data <strong id="deleteItemName"></strong>? This action cannot be undone.</p>
                             <div class="modal-actions">
                                 <button id="cancelDeleteBtn" class="btn cancel">Cancel</button>
@@ -582,15 +554,15 @@
                             </div>
                         </div>
 
-                        <!-- Notification Container -->
-                        <div id="notificationContainer"></div>
-
     </div>
                 <!-- end main content section -->
             </div>
             </div>
             </div>
         </div>
+
+        <!-- Notification Container -->
+        <div id="notificationContainer"></div>
 
         <script src="assets/js/alpine-collaspe.min.js"></script>
         <script src="assets/js/alpine-persist.min.js"></script>
@@ -601,14 +573,19 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script>
-    // Application state (will be loaded from server)
-    let hazardData = [];
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('user', {});
+    });
+</script>
+        <script>
+    // State
+    let barangays = [];
+    let municipalities = [];
     let filteredData = [];
     let currentPage = 1;
-    const rowsPerPage = 5;
+    const rowsPerPage = 10;
     let editId = null;
     let deleteId = null;
-    let allBarangays = [];
 
     // DOM elements
     const tableBody = document.getElementById("tableBody");
@@ -617,15 +594,13 @@
     const nextBtn = document.getElementById("nextBtn");
     const searchInput = document.getElementById("searchInput");
     const addBtn = document.getElementById("addBtn");
-    const modal = document.getElementById("hazardModal");
+    const modal = document.getElementById("barangayModal");
     const deleteModal = document.getElementById("deleteModal");
     const modalTitle = document.getElementById("modalTitle");
-    const barangay = document.getElementById("barangay");
-    const municipality = document.getElementById("municipality");
-    const disaster = document.getElementById("disaster");
-    const date = document.getElementById("date");
-    const severity = document.getElementById("severity");
-    const houseAffected = document.getElementById("houseAffected");
+    const barangay_code = document.getElementById("barangay_code");
+    const barangay_name = document.getElementById("barangay_name");
+    const municipalitySelect = document.getElementById("municipality_id");
+    const populationInput = document.getElementById("population");
     const cancelBtn = document.getElementById("cancelBtn");
     const saveBtn = document.getElementById("saveBtn");
     const saveBtnText = document.getElementById("saveBtnText");
@@ -682,22 +657,20 @@
         const pageData = filteredData.slice(start, end);
 
         if (pageData.length === 0) {
-            // colspan updated to match 8 columns
-            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">No hazards found.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">No barangay found.</td></tr>`;
         } else {
             pageData.forEach(item => {
+                const municipalityName = (municipalities.find(m => m.id === parseInt(item.municipality_id)) || {}).name || '';
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td>${item.id}</td>
-                    <td>${item.barangay}</td>
-                    <td>${item.municipality}</td>
-                    <td>${item.disaster_type}</td>
-                    <td>${item.date}</td>
-                    <td>${item.severity}</td>
-                    <td>${item.houses_affected || ''}</td>
+                    <td>${escapeHtml(item.code || '')}</td>
+                    <td>${escapeHtml(item.name || '')}</td>
+                    <td>${escapeHtml(municipalityName)}</td>
+                    <td>${escapeHtml(String(item.population || 0))}</td>
                     <td>
-                        <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Edit hazard">${getEditIcon()}</button>
-                        <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Delete hazard">${getTrashIcon()}</button>
+                        <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Edit">${getEditIcon()}</button>
+                        <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Delete">${getTrashIcon()}</button>
                     </td>
                 `;
                 tableBody.appendChild(tr);
@@ -707,7 +680,7 @@
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = parseInt(btn.getAttribute('data-id'));
-                    const item = hazardData.find(d => d.id === id);
+                    const item = barangays.find(d => d.id === id);
                     if (item) openModal(item);
                 });
             });
@@ -715,7 +688,7 @@
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = parseInt(btn.getAttribute('data-id'));
-                    const item = hazardData.find(d => d.id === id);
+                    const item = barangays.find(d => d.id === id);
                     if (item) openDeleteModal(item);
                 });
             });
@@ -730,23 +703,18 @@
     function openModal(item = null) {
         modal.classList.add("active");
         if (item) {
-            modalTitle.textContent = "Edit Data";
-            // set select values to ids (if available)
-            barangay.value = item.barangay_id || '';
-            municipality.value = item.municipality_id || '';
-            disaster.value = item.hazard_type_id || '';
-            date.value = item.date;
-            severity.value = item.severity || '';
-            houseAffected.value = item.houses_affected || '';
+            modalTitle.textContent = "Edit Barangay";
+            barangay_code.value = item.code || '';
+            barangay_name.value = item.name || '';
+            municipalitySelect.value = item.municipality_id || '';
+            populationInput.value = item.population || '';
             editId = item.id;
         } else {
-            modalTitle.textContent = "Add Data";
-            barangay.value = "";
-            municipality.value = "";
-            disaster.value = "";
-            date.value = "";
-            severity.value = "";
-            houseAffected.value = "";
+            modalTitle.textContent = "Add Barangay";
+            barangay_code.value = "";
+            barangay_name.value = "";
+            municipalitySelect.value = "";
+            populationInput.value = "";
             editId = null;
         }
         saveBtn.disabled = false;
@@ -756,7 +724,7 @@
 
     function openDeleteModal(item) {
         deleteModal.classList.add("active");
-        deleteItemName.textContent = item.id;
+        deleteItemName.textContent = escapeHtml(item.name || item.id);
         deleteId = item.id;
     }
 
@@ -768,84 +736,65 @@
         deleteModal.classList.remove("active");
     }
 
-    async function saveHazard() {
-        const barangayId = parseInt(barangay.value || 0, 10);
-        const municipalityId = parseInt(municipality.value || 0, 10);
-        const hazardTypeId = parseInt(disaster.value || 0, 10);
-        const eventDate = date.value;
-        const sev = severity.value.trim();
-        const houses = houseAffected.value.trim();
+    async function saveBarangay() {
+        const code = barangay_code.value.trim();
+        const name = barangay_name.value.trim();
+        const municipality_id = parseInt(municipalitySelect.value) || 0;
+        const population = parseInt(populationInput.value) || 0;
 
-        if (barangayId <= 0 || municipalityId <= 0 || hazardTypeId <= 0 || !eventDate) {
-            alert('Please fill required fields (barangay, municipality, disaster type and date).');
+        if (name === '' || municipality_id <= 0) {
+            showNotification('Name and municipality are required', 'warning');
             return;
         }
 
         saveBtn.disabled = true;
-        saveBtnText.textContent = "Saving...";
-        saveBtnSpinner.style.display = "inline-block";
-
-        const payload = {
-            barangay_id: barangayId,
-            municipality_id: municipalityId,
-            hazard_type_id: hazardTypeId,
-            event_date: eventDate,
-            severity: sev,
-            houses_affected: houses,
-        };
+        saveBtnText.textContent = 'Saving...';
+        saveBtnSpinner.style.display = 'inline-block';
 
         try {
-            let res;
             if (editId) {
-                payload.id = editId;
-                res = await fetch('api/hazard/update.php', {
+                const res = await fetch('api/barangay/update.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ id: editId, code, name, municipality_id, population })
                 });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Update failed');
+                showNotification('Barangay updated successfully');
             } else {
-                res = await fetch('api/hazard/create.php', {
+                const res = await fetch('api/barangay/create.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ code, name, municipality_id, population })
                 });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Create failed');
+                showNotification('Barangay added successfully');
             }
 
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                const msg = json && json.error ? json.error : 'Save failed';
-                showNotification(msg, 'error');
-                return;
-            }
-
-            showNotification(editId ? 'Hazard data updated successfully' : 'Hazard data added successfully');
-            // refresh list from server
-            await loadHazards();
+            await loadBarangays();
             closeModal();
         } catch (err) {
             showNotification('Error: ' + err.message, 'error');
         } finally {
             saveBtn.disabled = false;
-            saveBtnText.textContent = "Save";
-            saveBtnSpinner.style.display = "none";
+            saveBtnText.textContent = 'Save';
+            saveBtnSpinner.style.display = 'none';
         }
     }
 
     async function confirmDelete() {
         if (!deleteId) return;
         try {
-            const res = await fetch('api/hazard/delete.php', {
+            const res = await fetch('api/barangay/delete.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: deleteId })
             });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                showNotification(json.error || 'Delete failed', 'error');
-                return;
-            }
-            showNotification('Hazard data deleted successfully');
-            await loadHazards();
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Delete failed');
+            showNotification('Barangay deleted successfully');
+            await loadBarangays();
             closeDeleteModal();
         } catch (err) {
             showNotification('Error: ' + err.message, 'error');
@@ -854,102 +803,25 @@
 
     function searchHazards(query) {
         const q = query.toLowerCase();
-        filteredData = hazardData.filter(d =>
-            (d.barangay || '').toLowerCase().includes(q) ||
-            (d.municipality || '').toLowerCase().includes(q) ||
-            (d.disaster_type || '').toLowerCase().includes(q) ||
-            (d.date || '').toLowerCase().includes(q) ||
-            (d.severity || '').toLowerCase().includes(q) ||
-            (d.houses_affected || '').toLowerCase().includes(q)
-        );
+        filteredData = barangays.filter(d => {
+            const muniName = (municipalities.find(m => m.id === parseInt(d.municipality_id)) || {}).name || '';
+            return (d.code || '').toLowerCase().includes(q) ||
+                (d.name || '').toLowerCase().includes(q) ||
+                muniName.toLowerCase().includes(q) ||
+                String(d.population || 0).toLowerCase().includes(q);
+        });
         currentPage = 1;
         renderTable();
-    }
-
-    // Load helper data for selects
-    async function loadSelects() {
-        try {
-            const [mRes, bRes, htRes] = await Promise.all([
-                fetch('api/municipality/list.php'),
-                fetch('api/barangay/list.php'),
-                fetch('api/hazard_type/list.php'),
-            ]);
-            const mJson = await mRes.json();
-            const bJson = await bRes.json();
-            const htJson = await htRes.json();
-
-            if (mJson.success) {
-                municipality.innerHTML = '<option value="" disabled selected>Select Municipality</option>' + mJson.data.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
-            }
-            if (bJson.success) {
-                allBarangays = bJson.data || [];
-                barangay.innerHTML = '<option value="" disabled selected>Select Barangay</option>' + allBarangays.map(b => `<option value="${b.id}" data-municipality="${b.municipality_id}">${escapeHtml(b.name)}</option>`).join('');
-            }
-            if (htJson.success) {
-                disaster.innerHTML = '<option value="" disabled selected>Select Disaster</option>' + htJson.data.map(h => `<option value="${h.id}">${escapeHtml(h.name)}</option>`).join('');
-            }
-        } catch (err) {
-            console.error('Failed to load selects', err);
-        }
-    }
-
-    // small helper to avoid injecting HTML
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"]+/g, function (s) {
-            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[s];
-        });
-    }
-
-    // Load hazards from server
-    async function loadHazards() {
-        try {
-            const res = await fetch('api/hazard/list.php');
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                console.error('Failed to load hazards', json);
-                hazardData = [];
-            } else {
-                hazardData = json.data.map(r => ({
-                    id: parseInt(r.id, 10),
-                    barangay_id: r.barangay_id ? parseInt(r.barangay_id, 10) : null,
-                    barangay: r.barangay,
-                    municipality_id: r.municipality_id ? parseInt(r.municipality_id, 10) : null,
-                    municipality: r.municipality,
-                    hazard_type_id: r.hazard_type_id ? parseInt(r.hazard_type_id, 10) : null,
-                    disaster_type: r.disaster_type,
-                    date: r.date,
-                    severity: r.severity,
-                    houses_affected: r.houses_affected,
-                    created_at: r.created_at,
-                }));
-                filteredData = [...hazardData];
-            }
-            currentPage = 1;
-            renderTable();
-        } catch (err) {
-            console.error('Error loading hazards', err);
-            hazardData = [];
-            filteredData = [];
-            renderTable();
-        }
     }
 
     // Initialize event listeners
     function initEventListeners() {
         addBtn.addEventListener('click', () => openModal());
         cancelBtn.addEventListener('click', closeModal);
-        saveBtn.addEventListener('click', saveHazard);
-        municipality.addEventListener('change', () => {
-            const mid = municipality.value;
-            // filter barangays
-            const options = ['<option value="" disabled selected>Select Barangay</option>'];
-            allBarangays.filter(b => String(b.municipality_id) === String(mid)).forEach(b => options.push(`<option value="${b.id}">${escapeHtml(b.name)}</option>`));
-            barangay.innerHTML = options.join('');
-        });
+        saveBtn.addEventListener('click', saveBarangay);
         
         modal.addEventListener('click', (e) => {
-            if (e.target.id === 'hazardModal') closeModal();
+            if (e.target.id === 'barangayModal') closeModal();
         });
         
         deleteModal.addEventListener('click', (e) => {
@@ -976,11 +848,42 @@
         });
     }
 
+    // Helper: load municipalities
+    async function loadMunicipalities() {
+        try {
+            const res = await fetch('api/municipality/list.php');
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Failed to fetch municipalities');
+            municipalities = data.data.map(d => ({ id: parseInt(d.id), name: d.name }));
+            // populate select
+            municipalitySelect.innerHTML = '<option value="">-- Select Municipality --</option>' + municipalities.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+        } catch (err) {
+            console.error(err);
+            municipalitySelect.innerHTML = '<option value="">(Failed to load municipalities)</option>';
+        }
+    }
+
+    // Helper: load barangays
+    async function loadBarangays() {
+        try {
+            const res = await fetch('api/barangay/list.php');
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Failed to fetch barangays');
+            barangays = data.data.map(d => ({ id: parseInt(d.id), code: d.code, name: d.name, municipality_id: parseInt(d.municipality_id), population: parseInt(d.population || 0) }));
+            filteredData = [...barangays];
+            currentPage = 1;
+            renderTable();
+        } catch (err) {
+            console.error(err);
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">Error loading data</td></tr>`;
+        }
+    }
+
     // Initialize the application
     function init() {
         initEventListeners();
-        loadSelects();
-        loadHazards();
+        loadMunicipalities().then(() => loadBarangays());
+        loadUserData();
     }
 
     // Load user data and update the dropdown
@@ -1016,37 +919,17 @@
         }
     }
 
-    // Update the sidebar role display
-    function updateSidebarRole(role) {
-        const sidebarRoleElement = document.getElementById('sidebar-role');
-        if (sidebarRoleElement) {
-            // Capitalize the first letter of the role
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            sidebarRoleElement.textContent = displayRole;
-        }
-
-        // Also update the header role display
-        const headerRoleElement = document.getElementById('header-role');
-        if (headerRoleElement) {
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            headerRoleElement.textContent = displayRole;
-        }
-    }
-
     // Start the application when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        loadUserData();
-        init();
-    });
+    document.addEventListener('DOMContentLoaded', init);
 
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>"']/g, function (s) {
             return ({
                 '&': '&amp;',
-                '<': '<',
-                '>': '>',
-                '"': '"',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
                 "'": '&#39;'
             })[s];
         });

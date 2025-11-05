@@ -1016,23 +1016,6 @@
         }
     }
 
-    // Update the sidebar role display
-    function updateSidebarRole(role) {
-        const sidebarRoleElement = document.getElementById('sidebar-role');
-        if (sidebarRoleElement) {
-            // Capitalize the first letter of the role
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            sidebarRoleElement.textContent = displayRole;
-        }
-
-        // Also update the header role display
-        const headerRoleElement = document.getElementById('header-role');
-        if (headerRoleElement) {
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            headerRoleElement.textContent = displayRole;
-        }
-    }
-
     // Start the application when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         loadUserData();

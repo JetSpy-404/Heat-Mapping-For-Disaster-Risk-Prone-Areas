@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Hazard Data</title>
+        <title>Municipality Users</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/x-icon" href="favicon.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,55 +21,270 @@
         <script defer="" src="assets/js/popper.min.js"></script>
         <script defer="" src="assets/js/tippy-bundle.umd.min.js"></script>
         <script defer="" src="assets/js/sweetalert.min.js"></script>
-        <!-- Added: table layout fixes to keep headers and cells aligned -->
-		<style>
+        <style>
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease;
+            background-color: white;
+            box-sizing: border-box;
+        }
+
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1rem;
+            padding-right: 2rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .status-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.875rem;
+        }
+
+        .status-btn:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-btn.active {
+            border-color: #3b82f6;
+            background-color: #3b82f6;
+            color: white;
+        }
+
+
+
+        .status-btn[data-status="approved"] {
+            border-color: #10b981;
+            color: #059669;
+        }
+
+        .status-btn[data-status="approved"]:hover,
+        .status-btn[data-status="approved"].active {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #059669;
+        }
+
+        .status-btn[data-status="rejected"] {
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .status-btn[data-status="rejected"]:hover,
+        .status-btn[data-status="rejected"].active {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section h4 {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.25rem;
+        }
+
+        .profile-upload {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-xxs {
+            padding: 0.15rem 0.4rem;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            border-radius: 0.2rem;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 400px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease-in-out;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .notification.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-left: 4px solid;
+        }
+
+        .success-notification .notification-content {
+            border-left-color: #10b981;
+        }
+
+        .error-notification .notification-content {
+            border-left-color: #ef4444;
+        }
+
+        .notification-icon {
+            flex-shrink: 0;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .success-icon {
+            background-color: #d1fae5;
+            color: #10b981;
+        }
+
+        .error-icon {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .notification-text {
+            flex: 1;
+            margin: 0;
+        }
+
+        .notification-text p {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 12px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .notification-close:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .top-bar {
+            margin-bottom: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease;
+            background-color: white;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
 		.panel-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 		.icon-btn { background: none; border: none; padding: 4px; cursor: pointer; }
-
-		/* Notification Styles */
-		.notification {
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			background: #10b981;
-			color: white;
-			padding: 12px 16px;
-			border-radius: 8px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			z-index: 1000;
-			max-width: 300px;
-			font-size: 14px;
-			opacity: 0;
-			transform: translateY(-20px);
-			transition: all 0.3s ease;
-		}
-
-		.notification.show {
-			opacity: 1;
-			transform: translateY(0);
-		}
-
-		.notification.error {
-			background: #ef4444;
-		}
-
-		.notification.warning {
-			background: #f59e0b;
-		}
-
-		.notification .close-btn {
-			background: none;
-			border: none;
-			color: white;
-			font-size: 18px;
-			cursor: pointer;
-			margin-left: 8px;
-			opacity: 0.8;
-		}
-
-		.notification .close-btn:hover {
-			opacity: 1;
-		}
+		.profile-img-container { display: flex; align-items: center; justify-content: center; }
+		.profile-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+		.status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+		.status-pending { background-color: #fef3c7; color: #d97706; }
+		.status-approved { background-color: #d1fae5; color: #065f46; }
+		.status-rejected { background-color: #fee2e2; color: #dc2626; }
 		</style>
     </head>
 
@@ -92,11 +307,11 @@
 
         <div class="main-container min-h-screen text-black dark:text-white-dark" :class="[$store.app.navbar]">
             <!-- start sidebar section -->
-            <div :class="{'dark text-white-dark' : $store.app.semidark}">
+            <div :class="{'dark text-white-dark' : $store.app.semidark && $store.app.menu === 'horizontal'}">
                 <nav x-data="sidebar" class="sidebar fixed top-0 bottom-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300">
                     <div class="h-full bg-white dark:bg-[#0e1726]">
                         <div class="flex items-center justify-between px-4 py-3">
-                            <a href="dashboard.php" class="main-logo flex shrink-0 items-center">
+                            <a href="dashboard.html" class="main-logo flex shrink-0 items-center">
                                 <img class="ml-[5px] w-8 flex-none" src="assets/images/logo10.png" alt="image">
                                 <span id="sidebar-role" class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">Administrator</span>
                             </a>
@@ -124,7 +339,7 @@
                                         <a href="dashboard.php" class="group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path opacity="0.5" d="M13 15.4C13 13.3258 13 12.2887 13.659 11.6444C14.318 11 15.3787 11 17.5 11C19.6213 11 20.682 11 21.341 11.6444C22 12.2887 22 13.3258 22 15.4V17.6C22 19.6742 22 20.7113 21.341 21.3556C20.682 22 19.6213 22 17.5 22C15.3787 22 14.318 22 13.659 21.3556C13 20.7113 13 19.6742 13 17.6V15.4Z" fill="currentColor"></path>
+                                                    <path opacity="0.5" d="M13 15.4C13 13.3258 13 12.2887 13.659 11.6444C14.318 11 15.3787 11 17.5 11C19.6213 11 20.682 11 21.341 11.6444C22 12.2887 22 13.3258 22 15.4V17.6C22 19.6742 22 20.7113 21.341 20.8284C20.682 21 19.6213 21 17.5 21C15.3787 21 14.318 21 13.659 20.8284C13 20.7113 13 19.6742 13 17.6V15.4Z" fill="currentColor"></path>
                                                     <path d="M2 8.6C2 10.6742 2 11.7113 2.65901 12.3556C3.31802 13 4.37868 13 6.5 13C8.62132 13 9.68198 13 10.341 12.3556C11 11.7113 11 10.6742 11 8.6V6.4C11 4.32582 11 3.28873 10.341 2.64437C9.68198 2 8.62132 2 6.5 2C4.37868 2 3.31802 2 2.65901 2.64437C2 3.28873 2 4.32582 2 6.4V8.6Z" fill="currentColor"></path>
                                                     <path d="M13 5.5C13 4.4128 13 3.8692 13.1713 3.44041C13.3996 2.86867 13.8376 2.41443 14.389 2.17761C14.8024 2 15.3266 2 16.375 2H18.625C19.6734 2 20.1976 2 20.611 2.17761C21.1624 2.41443 21.6004 2.86867 21.8287 3.44041C22 3.8692 22 4.4128 22 5.5C22 6.5872 22 7.1308 21.8287 7.55959C21.6004 8.13133 21.1624 8.58557 20.611 8.82239C20.1976 9 19.6734 9 18.625 9H16.375C15.3266 9 14.8024 9 14.389 8.82239C13.8376 8.58557 13.3996 8.13133 13.1713 7.55959C13 7.1308 13 6.5872 13 5.5Z" fill="currentColor"></path>
                                                     <path opacity="0.5" d="M2 18.5C2 19.5872 2 20.1308 2.17127 20.5596C2.39963 21.1313 2.83765 21.5856 3.38896 21.8224C3.80245 22 4.32663 22 5.375 22H7.625C8.67337 22 9.19755 22 9.61104 21.8224C10.1624 21.5856 10.6004 21.1313 10.8287 20.5596C11 20.1308 11 19.5872 11 18.5C11 17.4128 11 16.8692 10.8287 16.4404C10.6004 15.8687 10.1624 15.4144 9.61104 15.1776C9.19755 15 8.67337 15 7.625 15H5.375C4.32663 15 3.80245 15 3.38896 15.1776C2.83765 15.4144 2.39963 15.8687 2.17127 16.4404C2 16.8692 2 17.4128 2 18.5Z" fill="currentColor"></path>
@@ -176,7 +391,7 @@
                                                     <g opacity="0.5">
                                                         <path d="M3 8.70938V16.8377C3 17.8813 3 18.4031 3.28314 18.7959C3.56627 19.1888 4.06129 19.3538 5.05132 19.6838L6.21609 20.072C7.58318 20.5277 8.26674 20.7556 8.95493 20.6634C8.96999 20.6614 8.98501 20.6593 9 20.6569V6.65705C8.88712 6.67391 8.77331 6.68433 8.6591 6.68823C8.11989 6.70665 7.58626 6.52877 6.51901 6.17302C5.12109 5.70705 4.42213 5.47406 3.89029 5.71066C3.70147 5.79466 3.53204 5.91678 3.39264 6.06935C3 6.49907 3 7.23584 3 8.70938Z" fill="currentColor"/>
                                                         <path d="M21 15.2907V7.16229C21 6.11872 21 5.59692 20.7169 5.20409C20.4337 4.81126 19.9387 4.64625 18.9487 4.31624L17.7839 3.92799C16.4168 3.47229 15.7333 3.24444 15.0451 3.3366C15.03 3.33861 15.015 3.34078 15 3.34309V17.343C15.1129 17.3261 15.2267 17.3157 15.3409 17.3118C15.8801 17.2934 16.4137 17.4713 17.481 17.827C18.8789 18.293 19.5779 18.526 20.1097 18.2894C20.2985 18.2054 20.468 18.0833 20.6074 17.9307C21 17.501 21 16.7642 21 15.2907Z" fill="currentColor"/>
-                                                        </g>
+                                                        <g opacity="0.5">
                                                         <path d="M9.24685 6.60921C9.16522 6.6285 9.08286 6.64435 9 6.65673V20.6566C9.66964 20.5533 10.2689 20.1538 11.4416 19.3719L12.824 18.4503C13.7601 17.8263 14.2281 17.5143 14.7532 17.3902C14.8348 17.3709 14.9171 17.355 15 17.3427V3.34277C14.3304 3.44613 13.7311 3.84561 12.5583 4.62747L11.176 5.54905C10.2399 6.17308 9.77191 6.48509 9.24685 6.60921Z" fill="currentColor"/>
                                                         <path d="M17.481 17.8267C17.5684 17.8558 17.653 17.884 17.735 17.9113L17.481 17.8267Z" fill="currentColor"/>
                                                 </svg>
@@ -196,7 +411,7 @@
                                         <a href="hazard_types.php" class="group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" fill="currentColor"></path>
+                                                    <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712
                                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 12C7.25 11.5858 7.58579 11.25 8 11.25H16C16.4142 11.25 16.75 11.5858 16.75 12C16.75 12.4142 16.4142 12.75 16 12.75H8C7.58579 12.75 7.25 12.4142 7.25 12Z" fill="currentColor"></path>
                                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 8C7.25 7.58579 7.58579 7.25 8 7.25H16C16.4142 7.25 16.75 7.58579 16.75 8C16.75 8.41421 16.4142 8.75 16 8.75H8C7.58579 8.75 7.25 8.41421 7.25 8Z" fill="currentColor"></path>
                                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 16C7.25 15.5858 7.58579 15.25 8 15.25H13C13.4142 15.25 13.75 15.5858 13.75 16C13.75 16.4142 13.4142 16.75 13 16.75H8C7.58579 16.75 7.25 16.4142 7.25 16Z" fill="currentColor"></path>
@@ -206,7 +421,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="hazard_data.php" class="active group">
+                                        <a href="hazard_data.php" class="group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M4.97883 9.68508C2.99294 8.89073 2 8.49355 2 8C2 7.50645 2.99294 7.10927 4.97883 6.31492L7.7873 5.19153C9.77318 4.39718 10.7661 4 12 4C13.2339 4 14.2268 4.39718 16.2127 5.19153L19.0212 6.31492C21.0071 7.10927 22 7.50645 22 8C22 8.49355 21.0071 8.89073 19.0212 9.68508L16.2127 10.8085C14.2268 11.6028 13.2339 12 12 12C10.7661 12 9.77318 11.6028 7.7873 10.8085L4.97883 9.68508Z" fill="currentColor"></path>
@@ -263,7 +478,7 @@
 
 
                             <li class="menu nav-item">
-                                <a href="municipality_users.php" class="nav-link group">
+                                <a href="municipality_users.php" class="active nav-link group">
                                     <div class="flex items-center">
                                         <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor"></circle>
@@ -282,14 +497,14 @@
             <!-- end sidebar section -->
 
             <div class="main-content flex flex-col min-h-screen">
-                               <!-- start header section -->
+                                <!-- start header section -->
                 <header class="z-40" :class="{'dark' : $store.app.semidark && $store.app.menu === 'horizontal'}">
                     <div class="shadow-sm">
                         <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
                             <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
                                 <a href="index.html" class="main-logo flex shrink-0 items-center">
                                     <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="assets/images/logo10.png" alt="image">
-                                    <span id="header-role" class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">Administrator</span>
+                                    <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">Administrator</span>
                                 </a>
 
                                 <a href="javascript:;" class="collapse-icon flex flex-none rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary ltr:ml-2 rtl:mr-2 dark:bg-dark/40 dark:text-[#d0d2d6] dark:hover:bg-dark/60 dark:hover:text-primary lg:hidden" @click="$store.app.toggleSidebar()">
@@ -430,13 +645,13 @@
                                         <li>
                                             <div class="flex items-center px-4 py-4">
                                                 <div class="flex-none">
-                                                    <img class="h-10 w-10 rounded-md object-cover" src="assets/images/logo.jpg" alt="image">
+                                                    <img class="h-10 w-10 rounded-md object-cover" :src="$store.user ? $store.user.profile_picture : 'assets/images/logo.jpg'" alt="image">
                                                 </div>
                                                 <div class="truncate ltr:pl-4 rtl:pr-4">
-                                                    <h4 class="text-base">
+                                                    <h4 class="text-base" x-html="$store.user ? escapeHtml($store.user.first_name) + ' ' + escapeHtml($store.user.last_name) + '<span class=\"rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2\">Pro</span>' : 'User'">
                                                         StarCode Kh<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>
                                                     </h4>
-                                                    <a class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white" href="javascript:;">starcodekh@gmail.com</a>
+                                                    <a class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white" href="javascript:;" x-text="$store.user ? $store.user.email : 'email@example.com'">starcodekh@gmail.com</a>
                                                 </div>
                                             </div>
                                         </li>
@@ -476,581 +691,655 @@
                 <div x-data="finance">
                     <ul class="flex space-x-2 rtl:space-x-reverse">
                         <li>
-                            <a href="javascript:;" class="text-primary hover:underline">Hazard Data</a>
+                            <a href="javascript:;" class="text-primary hover:underline">Municipality Users</a>
                         </li>
                     </ul>
-					<div class="pt-5">
+                    <div class="pt-5">
+                        <div class="mb-5 overflow-x-auto">
+                            <div class="panel">
+                                <div class="top-bar">
+                                    <input id="searchInput" class="form-input" type="text" placeholder="Search users..." />
+                                </div>
 
-                    <div class="mb-5 overflow-x-auto">
-                                <div class="panel">
-                                    <div class="top-bar">
-                                    <input id="searchInput" class="form-input" type="text" placeholder="Search hazards..." />
-                                    <button id="addBtn" class="add-btn">
-                                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                        Add Data
-                                    </button>
+                                <div class="panel-table-wrapper table-responsive">
+                                    <table class="data-table" aria-describedby="pageInfo">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Profile</th>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Email</th>
+                                                <th>Municipality</th>
+                                                <th>Address</th>
+                                                <th>Contact No.</th>
+                                                <th>User Type</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="panel" id="tableBody"></tbody>
+                                    </table>
+                                </div>
+
+                                <div class="pagination">
+                                    <p id="pageInfo"></p>
+                                    <div class="pagination-controls">
+                                        <button id="prevBtn">Previous</button>
+                                        <button id="nextBtn">Next</button>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div class="panel-table-wrapper">
-                    <table class="data-table table-responsive" aria-describedby="pageInfo">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Barangay</th>
-                                <th>Municipality</th>
-                                <th>Disaster Type</th>
-                                <th>Date</th>
-                                <th>Severity</th>
-                                <th>House Affected</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="panel" id="tableBody"></tbody>
-                    </table>
-                </div>
-
-                            <div class="pagination">
-                            <p id="pageInfo"></p>
-                            <div class="pagination-controls">
-                                <button id="prevBtn">Previous</button>
-                                <button id="nextBtn">Next</button>
+                            <!-- Users Form Modal -->
+                            <div id="userModal" class="modal overflow-x-auto">
+                                <div class="modal-content">
+                                    <h2 id="modalTitle">Edit User</h2>
+                                    <form id="userForm">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="first_name">First Name</label>
+                                                <input id="first_name" type="text" required />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="last_name">Last Name</label>
+                                                <input id="last_name" type="text" required />
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="municipality">Municipality</label>
+                                                <select id="municipality" required>
+                                                    <option value="">Select Municipality</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="usertype">User Type</label>
+                                                <select id="usertype" required>
+                                                    <option value="">Select User Type</option>
+                                                    <option value="administrator">Administrator</option>
+                                                    <option value="user">User</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input id="email" type="email" required />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="contact_number">Contact Number</label>
+                                                <input id="contact_number" type="tel" />
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="status">Status</label>
+                                                <div class="status-buttons">
+                                                    <button type="button" class="status-btn" data-status="approved">Approved</button>
+                                                    <button type="button" class="status-btn" data-status="rejected">Rejected</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="address">Address</label>
+                                            <textarea id="address" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="profile_picture">Profile Picture</label>
+                                            <div class="profile-upload">
+                                                <img id="profile_preview" src="" alt="Profile Preview" style="max-width: 100px; display: none;">
+                                                <input id="profile_picture" type="file" accept="image/*" onchange="previewImage(event)" />
+                                                <small>Supported formats: JPEG, PNG, GIF. Max size: 2MB</small>
+                                            </div>
+                                        </div>
+                                        <div class="modal-actions">
+                                            <button type="button" id="cancelBtn" class="btn cancel">Cancel</button>
+                                            <button type="submit" id="saveBtn" class="btn save">
+                                                <span id="saveBtnText">Save</span>
+                                                <div id="saveBtnSpinner" class="spinner" style="display: none;"></div>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                             </div>
-                        </div>
+                            </div>
 
-                        <!-- Hazard Form Modal -->
-                        <div id="hazardModal" class="modal">
-                            <div class="modal-content">
-                            <h2 id="modalTitle">Add Data</h2>
-                            <div class="form-group">
-                                <label for="barangay">Barangay</label>
-                                <select id="barangay" class="form-select">
-                                    <option value="" disabled selected>Select Barangay</option>
-                                </select>
+                            <!-- Delete Confirmation Modal -->
+                            <div id="deleteModal" class="modal">
+                                <div class="modal-content delete-modal-content">
+                                    <div class="delete-icon">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                        </svg>
+                                    </div>
+                                    <h2>Delete User</h2>
+                                    <p class="delete-modal-text">Are you sure you want to delete user <strong id="deleteItemName"></strong>? This action cannot be undone.</p>
+                                    <div class="modal-actions">
+                                        <button id="cancelDeleteBtn" class="btn cancel">Cancel</button>
+                                        <button id="confirmDeleteBtn" class="btn delete">Delete</button>
+                                    </div>
+                                </div>
                             </div>
-                             <div class="form-group">
-                                <label for="municipality">Municipality</label>
-                                <select id="municipality" class="form-select">
-                                    <option value="" disabled selected>Select Municipality</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="disaster">Disaster Types</label>
-                                <select class="form-select" id="disaster" required>
-                                        <option value="" selected disabled>Select Disaster</option>
-                                        <option value="Geological">Landslide</option>
-                                        <option value="Hydrological">Floods</option>
-                                        <option value="Meteorological">Storm Surge</option>
-                                    </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="date">Date</label>
-                                <input id="date" type="date" />
-                            </div>
-                            <div class="form-group">
-                                <label for="severity">Severity</label>
-                                <input id="severity" type="text" />
-                            </div>
-                            <div class="form-group">
-                                <label for="houseAffected">House Affected</label>
-                                <input id="houseAffected" type="text" />
-                            </div>
-                            <div class="modal-actions">
-                                <button id="cancelBtn" class="btn cancel">Cancel</button>
-                                <button id="saveBtn" class="btn save">
-                                <span id="saveBtnText">Save</span>
-                                <div id="saveBtnSpinner" class="spinner" style="display: none;"></div>
-                                </button>
-                            </div>
-                            </div>
-                        </div>
 
-                        <!-- Delete Confirmation Modal -->
-                        <div id="deleteModal" class="modal">
-                            <div class="modal-content delete-modal-content">
-                            <div class="delete-icon">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                </svg>
+                            <!-- Success Notification -->
+                            <div id="successModal" class="notification success-notification">
+                                <div class="notification-content">
+                                    <div class="notification-icon success-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-text">
+                                        <p id="successMessage">User updated successfully!</p>
+                                    </div>
+                                    <button id="closeSuccessBtn" class="notification-close">&times;</button>
+                                </div>
                             </div>
-                            <h2>Delete Hazard</h2>
-                            <p class="delete-modal-text">Are you sure you want to delete data <strong id="deleteItemName"></strong>? This action cannot be undone.</p>
-                            <div class="modal-actions">
-                                <button id="cancelDeleteBtn" class="btn cancel">Cancel</button>
-                                <button id="confirmDeleteBtn" class="btn delete">Delete</button>
+
+                            <!-- Error Notification -->
+                            <div id="errorModal" class="notification error-notification">
+                                <div class="notification-content">
+                                    <div class="notification-icon error-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-text">
+                                        <p id="errorMessage">An error occurred while updating the user.</p>
+                                    </div>
+                                    <button id="closeErrorBtn" class="notification-close">&times;</button>
+                                </div>
+                            </div>
+
+                            </div>
+                            <!-- end main content section -->
                             </div>
                             </div>
-                        </div>
+                            </div>
+                            </div>
 
-                        <!-- Notification Container -->
-                        <div id="notificationContainer"></div>
+                            <script src="assets/js/alpine-collaspe.min.js"></script>
+                            <script src="assets/js/alpine-persist.min.js"></script>
+                            <script defer="" src="assets/js/alpine-ui.min.js"></script>
+                            <script defer="" src="assets/js/alpine-focus.min.js"></script>
+                            <script defer="" src="assets/js/alpine.min.js"></script>
+                            <script src="assets/js/custom.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                            <script>
+                            // Initialize data
+                            let userData = [];
 
-    </div>
-                <!-- end main content section -->
-            </div>
-            </div>
-            </div>
-        </div>
+                            let filteredData = [...userData];
+                            let currentPage = 1;
+                            const rowsPerPage = 5;
+                            let editId = null;
+                            let deleteId = null;
 
-        <script src="assets/js/alpine-collaspe.min.js"></script>
-        <script src="assets/js/alpine-persist.min.js"></script>
-        <script defer="" src="assets/js/alpine-ui.min.js"></script>
-        <script defer="" src="assets/js/alpine-focus.min.js"></script>
-        <script defer="" src="assets/js/alpine.min.js"></script>
-        <script src="assets/js/custom.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <script>
-    // Application state (will be loaded from server)
-    let hazardData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    const rowsPerPage = 5;
-    let editId = null;
-    let deleteId = null;
-    let allBarangays = [];
+                            // DOM elements
+                            const tableBody = document.getElementById("tableBody");
+                            const pageInfo = document.getElementById("pageInfo");
+                            const prevBtn = document.getElementById("prevBtn");
+                            const nextBtn = document.getElementById("nextBtn");
+                            const searchInput = document.getElementById("searchInput");
+                            const modal = document.getElementById("userModal");
+                            const deleteModal = document.getElementById("deleteModal");
+                            const modalTitle = document.getElementById("modalTitle");
+                            const profilePicture = document.getElementById("profile_picture");
+                            const firstName = document.getElementById("first_name");
+                            const lastName = document.getElementById("last_name");
+                            const email = document.getElementById("email");
+                            const municipality = document.getElementById("municipality");
+                            const address = document.getElementById("address");
+                            const contactNumber = document.getElementById("contact_number");
+                            const usertype = document.getElementById("usertype");
+                            const statusButtons = document.querySelectorAll('.status-btn');
+                            let selectedStatus = 'approved';
+                            const cancelBtn = document.getElementById("cancelBtn");
+                            const saveBtn = document.getElementById("saveBtn");
+                            const saveBtnText = document.getElementById("saveBtnText");
+                            const saveBtnSpinner = document.getElementById("saveBtnSpinner");
+                            const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+                            const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+                            const deleteItemName = document.getElementById("deleteItemName");
+                            const successModal = document.getElementById("successModal");
+                            const errorModal = document.getElementById("errorModal");
+                            const successMessage = document.getElementById("successMessage");
+                            const errorMessage = document.getElementById("errorMessage");
+                            const closeSuccessBtn = document.getElementById("closeSuccessBtn");
+                            const closeErrorBtn = document.getElementById("closeErrorBtn");
 
-    // DOM elements
-    const tableBody = document.getElementById("tableBody");
-    const pageInfo = document.getElementById("pageInfo");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const searchInput = document.getElementById("searchInput");
-    const addBtn = document.getElementById("addBtn");
-    const modal = document.getElementById("hazardModal");
-    const deleteModal = document.getElementById("deleteModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const barangay = document.getElementById("barangay");
-    const municipality = document.getElementById("municipality");
-    const disaster = document.getElementById("disaster");
-    const date = document.getElementById("date");
-    const severity = document.getElementById("severity");
-    const houseAffected = document.getElementById("houseAffected");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const saveBtn = document.getElementById("saveBtn");
-    const saveBtnText = document.getElementById("saveBtnText");
-    const saveBtnSpinner = document.getElementById("saveBtnSpinner");
-    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-    const deleteItemName = document.getElementById("deleteItemName");
+                            // SVG icons
+                            function getEditIcon() {
+                                return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 hover:text-info">
+                                    <path opacity="0.5" d="M22 10.5V12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <path d="M17.3009 2.80624L16.652 3.45506L10.6872 9.41993C10.2832 9.82394 10.0812 10.0259 9.90743 10.2487C9.70249 10.5114 9.52679 10.7957 9.38344 11.0965C9.26191 11.3515 9.17157 11.6225 8.99089 12.1646L8.41242 13.9L8.03811 15.0229C7.9492 15.2897 8.01862 15.5837 8.21744 15.7826C8.41626 15.9814 8.71035 16.0508 8.97709 15.9619L10.1 15.5876L11.8354 15.0091C12.3775 14.8284 12.6485 14.7381 12.9035 14.6166C13.2043 14.4732 13.4886 14.2975 13.7513 14.0926C13.9741 13.9188 14.1761 13.7168 14.5801 13.3128L20.5449 7.34795L21.1938 6.69914C22.2687 5.62415 22.2687 3.88124 21.1938 2.80624C20.1188 1.73125 18.3759 1.73125 17.3009 2.80624Z" stroke="currentColor" stroke-width="1.5"></path>
+                                    <path opacity="0.5" d="M16.6522 3.45508C16.6522 3.45508 16.7333 4.83381 17.9499 6.05034C19.1664 7.26687 20.5451 7.34797 20.5451 7.34797M10.1002 15.5876L8.4126 13.9" stroke="currentColor" stroke-width="1.5"></path>
+                                </svg>`;
+                            }
 
-    // Notification functions
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notificationContainer');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <span>${message}</span>
-            <span class="close-btn" onclick="this.parentElement.remove()">&times;</span>
-        `;
-        container.appendChild(notification);
+                            function getTrashIcon() {
+                                return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hover:text-danger">
+                                    <path d="M20.5001 6H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <path d="M18.8334 8.5L18.3735 15.3991C18.1965 18.054 18.108 19.3815 17.243 20.1907C16.378 21 15.0476 21 12.3868 21H11.6134C8.9526 21 7.6222 21 6.75719 20.1907C5.89218 19.3815 5.80368 18.054 5.62669 15.3991L5.16675 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <path opacity="0.5" d="M9.5 11L10 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <path opacity="0.5" d="M14.5 11L14 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <path opacity="0.5" d="M6.5 6C6.55588 6 6.58382 6 6.60915 5.99936C7.43259 5.97849 8.15902 5.45491 8.43922 4.68032C8.44784 4.65649 8.45667 4.62999 8.47434 4.57697L8.57143 4.28571C8.65431 4.03708 8.69575 3.91276 8.75071 3.8072C8.97001 3.38607 9.37574 3.09364 9.84461 3.01877C9.96213 3 10.0932 3 10.3553 3H13.6447C13.9068 3 14.0379 3 14.1554 3.01877C14.6243 3.09364 15.03 3.38607 15.2493 3.8072C15.3043 3.91276 15.3457 4.03708 15.4286 4.28571L15.5257 4.57697C15.5433 4.62992 15.5522 4.65651 15.5608 4.68032C15.841 5.45491 16.5674 5.97849 17.3909 5.99936C17.4162 6 17.4441 6 17.5 6" stroke="currentColor" stroke-width="1.5"></path>
+                                </svg>`;
+                            }
 
-        // Trigger animation
-        setTimeout(() => notification.classList.add('show'), 10);
 
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 5000);
-    }
 
-    // SVG icons
-    function getEditIcon() {
-        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 hover:text-info">
-            <path opacity="0.5" d="M22 10.5V12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            <path d="M17.3009 2.80624L16.652 3.45506L10.6872 9.41993C10.2832 9.82394 10.0812 10.0259 9.90743 10.2487C9.70249 10.5114 9.52679 10.7957 9.38344 11.0965C9.26191 11.3515 9.17157 11.6225 8.99089 12.1646L8.41242 13.9L8.03811 15.0229C7.9492 15.2897 8.01862 15.5837 8.21744 15.7826C8.41626 15.9814 8.71035 16.0508 8.97709 15.9619L10.1 15.5876L11.8354 15.0091C12.3775 14.8284 12.6485 14.7381 12.9035 14.6166C13.2043 14.4732 13.4886 14.2975 13.7513 14.0926C13.9741 13.9188 14.1761 13.7168 14.5801 13.3128L20.5449 7.34795L21.1938 6.69914C22.2687 5.62415 22.2687 3.88124 21.1938 2.80624C20.1188 1.73125 18.3759 1.73125 17.3009 2.80624Z" stroke="currentColor" stroke-width="1.5"></path>
-            <path opacity="0.5" d="M16.6522 3.45508C16.6522 3.45508 16.7333 4.83381 17.9499 6.05034C19.1664 7.26687 20.5451 7.34797 20.5451 7.34797M10.1002 15.5876L8.4126 13.9" stroke="currentColor" stroke-width="1.5"></path>
-        </svg>`;
-    }
+                            // Render table function
+                            function renderTable() {
+                                tableBody.innerHTML = "";
+                                const start = (currentPage - 1) * rowsPerPage;
+                                const end = start + rowsPerPage;
+                                const pageData = filteredData.slice(start, end);
 
-    function getTrashIcon() {
-        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hover:text-danger">
-            <path d="M20.5001 6H3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            <path d="M18.8334 8.5L18.3735 15.3991C18.1965 18.054 18.108 19.3815 17.243 20.1907C16.378 21 15.0476 21 12.3868 21H11.6134C8.9526 21 7.6222 21 6.75719 20.1907C5.89218 19.3815 5.80368 18.054 5.62669 15.3991L5.16675 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            <path opacity="0.5" d="M9.5 11L10 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            <path opacity="0.5" d="M14.5 11L14 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-            <path opacity="0.5" d="M6.5 6C6.55588 6 6.58382 6 6.60915 5.99936C7.43259 5.97849 8.15902 5.45491 8.43922 4.68032C8.44784 4.65649 8.45667 4.62999 8.47434 4.57697L8.57143 4.28571C8.65431 4.03708 8.69575 3.91276 8.75071 3.8072C8.97001 3.38607 9.37574 3.09364 9.84461 3.01877C9.96213 3 10.0932 3 10.3553 3H13.6447C13.9068 3 14.0379 3 14.1554 3.01877C14.6243 3.09364 15.03 3.38607 15.2493 3.8072C15.3043 3.91276 15.3457 4.03708 15.4286 4.28571L15.5257 4.57697C15.5433 4.62992 15.5522 4.65651 15.5608 4.68032C15.841 5.45491 16.5674 5.97849 17.3909 5.99936C17.4162 6 17.4441 6 17.5 6" stroke="currentColor" stroke-width="1.5"></path>
-        </svg>`;
-    }
+                                if (pageData.length === 0) {
+                                    // colspan updated to match 11 columns
+                                    tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 40px;">No users found.</td></tr>`;
+                                } else {
+                                    pageData.forEach(item => {
+                                        const tr = document.createElement("tr");
+                                        tr.innerHTML = `
+                                        <td>${item.id}</td>
+                                        <td>
+                                            <div class="profile-img-container">
+                                                <img src="${item.profile_picture}" alt="Profile" class="profile-img">
+                                            </div>
+                                        </td>
+                                        <td>${item.first_name}</td>
+                                        <td>${item.last_name}</td>
+                                        <td>${item.email}</td>
+                                        <td>${item.municipality}</td>
+                                        <td>${item.address}</td>
+                                        <td>${item.contact_number}</td>
+                                        <td>${item.usertype}</td>
+                                        <td><span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span></td>
+                                        <td>
+                                            <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Edit user">${getEditIcon()}</button>
+                                            <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Delete user">${getTrashIcon()}</button>
+                                        </td>
+                                        `;
+                                        tableBody.appendChild(tr);
+                                    });
 
-    // Render table function
-    function renderTable() {
-        tableBody.innerHTML = "";
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const pageData = filteredData.slice(start, end);
+                                    // Add event listeners after rendering
+                                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                                        btn.addEventListener('click', () => {
+                                            const id = parseInt(btn.getAttribute('data-id'));
+                                            const item = userData.find(d => d.id === id);
+                                            if (item) openModal(item);
+                                        });
+                                    });
 
-        if (pageData.length === 0) {
-            // colspan updated to match 8 columns
-            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">No hazards found.</td></tr>`;
-        } else {
-            pageData.forEach(item => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.barangay}</td>
-                    <td>${item.municipality}</td>
-                    <td>${item.disaster_type}</td>
-                    <td>${item.date}</td>
-                    <td>${item.severity}</td>
-                    <td>${item.houses_affected || ''}</td>
-                    <td>
-                        <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Edit hazard">${getEditIcon()}</button>
-                        <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Delete hazard">${getTrashIcon()}</button>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
+                                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                                        btn.addEventListener('click', () => {
+                                            const id = parseInt(btn.getAttribute('data-id'));
+                                            const item = userData.find(d => d.id === id);
+                                            if (item) openDeleteModal(item);
+                                        });
+                                    });
 
-            // Add event listeners after rendering
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = parseInt(btn.getAttribute('data-id'));
-                    const item = hazardData.find(d => d.id === id);
-                    if (item) openModal(item);
-                });
-            });
 
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = parseInt(btn.getAttribute('data-id'));
-                    const item = hazardData.find(d => d.id === id);
-                    if (item) openDeleteModal(item);
-                });
-            });
-        }
+                                }
 
-        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-        pageInfo.textContent = `Page ${currentPage} of ${Math.max(1, totalPages)}`;
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || filteredData.length === 0;
-    }
+                                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                                pageInfo.textContent = `Page ${currentPage} of ${Math.max(1, totalPages)}`;
+                                prevBtn.disabled = currentPage === 1;
+                                nextBtn.disabled = currentPage === totalPages || filteredData.length === 0;
+                            }
 
-    function openModal(item = null) {
-        modal.classList.add("active");
-        if (item) {
-            modalTitle.textContent = "Edit Data";
-            // set select values to ids (if available)
-            barangay.value = item.barangay_id || '';
-            municipality.value = item.municipality_id || '';
-            disaster.value = item.hazard_type_id || '';
-            date.value = item.date;
-            severity.value = item.severity || '';
-            houseAffected.value = item.houses_affected || '';
-            editId = item.id;
-        } else {
-            modalTitle.textContent = "Add Data";
-            barangay.value = "";
-            municipality.value = "";
-            disaster.value = "";
-            date.value = "";
-            severity.value = "";
-            houseAffected.value = "";
-            editId = null;
-        }
-        saveBtn.disabled = false;
-        saveBtnText.textContent = "Save";
-        saveBtnSpinner.style.display = "none";
-    }
+                            function openModal(item) {
+                                modal.classList.add("active");
+                                modalTitle.textContent = "Edit User";
 
-    function openDeleteModal(item) {
-        deleteModal.classList.add("active");
-        deleteItemName.textContent = item.id;
-        deleteId = item.id;
-    }
+                                firstName.value = item.first_name;
+                                lastName.value = item.last_name;
+                                email.value = item.email;
+                                // Set municipality select value by name
+                                municipality.value = item.municipality;
+                                address.value = item.address;
+                                contactNumber.value = item.contact_number;
+                                usertype.value = item.usertype;
+                                selectedStatus = item.status;
 
-    function closeModal() {
-        modal.classList.remove("active");
-    }
+                                // Update status buttons
+                                statusButtons.forEach(btn => {
+                                    if (btn.getAttribute('data-status') === selectedStatus) {
+                                        btn.classList.add('active');
+                                    } else {
+                                        btn.classList.remove('active');
+                                    }
+                                });
 
-    function closeDeleteModal() {
-        deleteModal.classList.remove("active");
-    }
+                                // Set profile picture preview
+                                if (item.profile_picture && item.profile_picture !== 'assets/images/default-avatar.jpg') {
+                                    profile_preview.src = item.profile_picture;
+                                    profile_preview.style.display = 'block';
+                                } else {
+                                    profile_preview.style.display = 'none';
+                                }
 
-    async function saveHazard() {
-        const barangayId = parseInt(barangay.value || 0, 10);
-        const municipalityId = parseInt(municipality.value || 0, 10);
-        const hazardTypeId = parseInt(disaster.value || 0, 10);
-        const eventDate = date.value;
-        const sev = severity.value.trim();
-        const houses = houseAffected.value.trim();
+                                editId = item.id;
 
-        if (barangayId <= 0 || municipalityId <= 0 || hazardTypeId <= 0 || !eventDate) {
-            alert('Please fill required fields (barangay, municipality, disaster type and date).');
-            return;
-        }
+                                saveBtn.disabled = false;
+                                saveBtnText.textContent = "Save";
+                                saveBtnSpinner.style.display = "none";
+                            }
 
-        saveBtn.disabled = true;
-        saveBtnText.textContent = "Saving...";
-        saveBtnSpinner.style.display = "inline-block";
+                            function openDeleteModal(item) {
+                                deleteModal.classList.add("active");
+                                deleteItemName.textContent = `${item.first_name} ${item.last_name}`;
+                                deleteId = item.id;
+                            }
 
-        const payload = {
-            barangay_id: barangayId,
-            municipality_id: municipalityId,
-            hazard_type_id: hazardTypeId,
-            event_date: eventDate,
-            severity: sev,
-            houses_affected: houses,
-        };
+                            function closeModal() {
+                                modal.classList.remove("active");
+                            }
 
-        try {
-            let res;
-            if (editId) {
-                payload.id = editId;
-                res = await fetch('api/hazard/update.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } else {
-                res = await fetch('api/hazard/create.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            }
+                            function closeDeleteModal() {
+                                deleteModal.classList.remove("active");
+                            }
 
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                const msg = json && json.error ? json.error : 'Save failed';
-                showNotification(msg, 'error');
-                return;
-            }
+                            function showSuccessModal(message) {
+                                successMessage.textContent = message;
+                                successModal.classList.add("active");
+                                setTimeout(() => {
+                                    closeSuccessModal();
+                                }, 3000); // Auto-close after 3 seconds
+                            }
 
-            showNotification(editId ? 'Hazard data updated successfully' : 'Hazard data added successfully');
-            // refresh list from server
-            await loadHazards();
-            closeModal();
-        } catch (err) {
-            showNotification('Error: ' + err.message, 'error');
-        } finally {
-            saveBtn.disabled = false;
-            saveBtnText.textContent = "Save";
-            saveBtnSpinner.style.display = "none";
-        }
-    }
+                            function showErrorModal(message) {
+                                errorMessage.textContent = message;
+                                errorModal.classList.add("active");
+                                setTimeout(() => {
+                                    closeErrorModal();
+                                }, 5000); // Auto-close after 5 seconds
+                            }
 
-    async function confirmDelete() {
-        if (!deleteId) return;
-        try {
-            const res = await fetch('api/hazard/delete.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: deleteId })
-            });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                showNotification(json.error || 'Delete failed', 'error');
-                return;
-            }
-            showNotification('Hazard data deleted successfully');
-            await loadHazards();
-            closeDeleteModal();
-        } catch (err) {
-            showNotification('Error: ' + err.message, 'error');
-        }
-    }
+                            function closeSuccessModal() {
+                                successModal.classList.remove("active");
+                            }
 
-    function searchHazards(query) {
-        const q = query.toLowerCase();
-        filteredData = hazardData.filter(d =>
-            (d.barangay || '').toLowerCase().includes(q) ||
-            (d.municipality || '').toLowerCase().includes(q) ||
-            (d.disaster_type || '').toLowerCase().includes(q) ||
-            (d.date || '').toLowerCase().includes(q) ||
-            (d.severity || '').toLowerCase().includes(q) ||
-            (d.houses_affected || '').toLowerCase().includes(q)
-        );
-        currentPage = 1;
-        renderTable();
-    }
+                            function closeErrorModal() {
+                                errorModal.classList.remove("active");
+                            }
 
-    // Load helper data for selects
-    async function loadSelects() {
-        try {
-            const [mRes, bRes, htRes] = await Promise.all([
-                fetch('api/municipality/list.php'),
-                fetch('api/barangay/list.php'),
-                fetch('api/hazard_type/list.php'),
-            ]);
-            const mJson = await mRes.json();
-            const bJson = await bRes.json();
-            const htJson = await htRes.json();
+                            async function saveUser() {
+                                const firstNameValue = firstName.value.trim();
+                                const lastNameValue = lastName.value.trim();
+                                const emailValue = email.value.trim();
+                                const municipalityValue = municipality.value;
+                                const addressValue = address.value.trim();
+                                const contactNumberValue = contactNumber.value.trim();
+                                const usertypeValue = usertype.value.trim();
+                                const statusValue = selectedStatus;
 
-            if (mJson.success) {
-                municipality.innerHTML = '<option value="" disabled selected>Select Municipality</option>' + mJson.data.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
-            }
-            if (bJson.success) {
-                allBarangays = bJson.data || [];
-                barangay.innerHTML = '<option value="" disabled selected>Select Barangay</option>' + allBarangays.map(b => `<option value="${b.id}" data-municipality="${b.municipality_id}">${escapeHtml(b.name)}</option>`).join('');
-            }
-            if (htJson.success) {
-                disaster.innerHTML = '<option value="" disabled selected>Select Disaster</option>' + htJson.data.map(h => `<option value="${h.id}">${escapeHtml(h.name)}</option>`).join('');
-            }
-        } catch (err) {
-            console.error('Failed to load selects', err);
-        }
-    }
+                                if (!firstNameValue || !lastNameValue || !emailValue || !municipalityValue) {
+                                    alert("First name, last name, email, and municipality are required!");
+                                    return;
+                                }
 
-    // small helper to avoid injecting HTML
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"]+/g, function (s) {
-            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[s];
-        });
-    }
+                                // Validate municipality selection
+                                if (municipalityValue === "") {
+                                    alert("Please select a valid municipality!");
+                                    return;
+                                }
 
-    // Load hazards from server
-    async function loadHazards() {
-        try {
-            const res = await fetch('api/hazard/list.php');
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                console.error('Failed to load hazards', json);
-                hazardData = [];
-            } else {
-                hazardData = json.data.map(r => ({
-                    id: parseInt(r.id, 10),
-                    barangay_id: r.barangay_id ? parseInt(r.barangay_id, 10) : null,
-                    barangay: r.barangay,
-                    municipality_id: r.municipality_id ? parseInt(r.municipality_id, 10) : null,
-                    municipality: r.municipality,
-                    hazard_type_id: r.hazard_type_id ? parseInt(r.hazard_type_id, 10) : null,
-                    disaster_type: r.disaster_type,
-                    date: r.date,
-                    severity: r.severity,
-                    houses_affected: r.houses_affected,
-                    created_at: r.created_at,
-                }));
-                filteredData = [...hazardData];
-            }
-            currentPage = 1;
-            renderTable();
-        } catch (err) {
-            console.error('Error loading hazards', err);
-            hazardData = [];
-            filteredData = [];
-            renderTable();
-        }
-    }
+                                saveBtn.disabled = true;
+                                saveBtnText.textContent = "Saving...";
+                                saveBtnSpinner.style.display = "inline-block";
 
-    // Initialize event listeners
-    function initEventListeners() {
-        addBtn.addEventListener('click', () => openModal());
-        cancelBtn.addEventListener('click', closeModal);
-        saveBtn.addEventListener('click', saveHazard);
-        municipality.addEventListener('change', () => {
-            const mid = municipality.value;
-            // filter barangays
-            const options = ['<option value="" disabled selected>Select Barangay</option>'];
-            allBarangays.filter(b => String(b.municipality_id) === String(mid)).forEach(b => options.push(`<option value="${b.id}">${escapeHtml(b.name)}</option>`));
-            barangay.innerHTML = options.join('');
-        });
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target.id === 'hazardModal') closeModal();
-        });
-        
-        deleteModal.addEventListener('click', (e) => {
-            if (e.target.id === 'deleteModal') closeDeleteModal();
-        });
-        
-        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-        confirmDeleteBtn.addEventListener('click', confirmDelete);
-        
-        searchInput.addEventListener('input', (e) => searchHazards(e.target.value));
-        
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-            }
-        });
-        
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
-                currentPage++;
-                renderTable();
-            }
-        });
-    }
+                                try {
+                                    const formData = new FormData();
+                                    formData.append('id', editId);
+                                    formData.append('first_name', firstNameValue);
+                                    formData.append('last_name', lastNameValue);
+                                    formData.append('email', emailValue);
+                                    formData.append('municipality', municipalityValue);
+                                    formData.append('address', addressValue);
+                                    formData.append('contact_number', contactNumberValue);
+                                    formData.append('usertype', usertypeValue);
+                                    formData.append('status', statusValue);
 
-    // Initialize the application
-    function init() {
-        initEventListeners();
-        loadSelects();
-        loadHazards();
-    }
+                                    // Add profile picture if selected
+                                    if (profilePicture.files.length > 0) {
+                                        formData.append('profile_picture', profilePicture.files[0]);
+                                    }
 
-    // Load user data and update the dropdown
-    async function loadUserData() {
-        try {
-            const res = await fetch('api/users/current.php');
-            const data = await res.json();
-            if (data.success) {
-                Alpine.store('user', data.data);
-                updateUserDropdown(data.data);
-                updateSidebarRole(data.data.role);
-            }
-        } catch (err) {
-            console.error('Failed to load user data:', err);
-        }
-    }
+                                    const response = await fetch('api/users/update.php', {
+                                        method: 'POST',
+                                        body: formData
+                                    });
 
-    // Update the user dropdown with fetched data
-    function updateUserDropdown(user) {
-        const dropdown = document.querySelector('.dropdown.flex-shrink-0');
-        if (dropdown) {
-            const triggerImg = dropdown.querySelector('a img');
-            const dropdownImg = dropdown.querySelector('ul li img');
-            const nameSpan = dropdown.querySelector('h4');
-            const emailA = dropdown.querySelector('ul li a');
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        // Refresh data
+                                        await fetchUsers();
+                                        closeModal();
+                                        showSuccessModal('User updated successfully!');
+                                    } else {
+                                        showErrorModal('Error saving user: ' + result.error);
+                                    }
+                                } catch (error) {
+                                    console.error('Error saving user:', error);
+                                    showErrorModal('Error saving user');
+                                } finally {
+                                    saveBtn.disabled = false;
+                                    saveBtnText.textContent = "Save";
+                                    saveBtnSpinner.style.display = "none";
+                                }
+                            }
 
-            if (triggerImg) triggerImg.src = user.profile_picture || 'assets/images/logo.jpg';
-            if (dropdownImg) dropdownImg.src = user.profile_picture || 'assets/images/logo.jpg';
-            if (nameSpan) {
-                nameSpan.innerHTML = `${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>`;
-            }
-            if (emailA) emailA.textContent = user.email;
-        }
-    }
+                            function previewImage(event) {
+                                const file = event.target.files[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        profile_preview.src = e.target.result;
+                                        profile_preview.style.display = 'block';
+                                    };
+                                    reader.readAsDataURL(file);
+                                } else {
+                                    profile_preview.style.display = 'none';
+                                }
+                            }
 
-    // Update the sidebar role display
-    function updateSidebarRole(role) {
-        const sidebarRoleElement = document.getElementById('sidebar-role');
-        if (sidebarRoleElement) {
-            // Capitalize the first letter of the role
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            sidebarRoleElement.textContent = displayRole;
-        }
+                            async function confirmDelete() {
+                                if (!deleteId) return;
 
-        // Also update the header role display
-        const headerRoleElement = document.getElementById('header-role');
-        if (headerRoleElement) {
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            headerRoleElement.textContent = displayRole;
-        }
-    }
+                                try {
+                                    const response = await fetch('api/users/delete.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ id: deleteId })
+                                    });
 
-    // Start the application when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        loadUserData();
-        init();
-    });
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        // Refresh data
+                                        await fetchUsers();
+                                        closeDeleteModal();
+                                        showSuccessModal('User deleted successfully!');
+                                    } else {
+                                        showErrorModal('Error deleting user: ' + result.error);
+                                    }
+                                } catch (error) {
+                                    console.error('Error deleting user:', error);
+                                    showErrorModal('Error deleting user');
+                                }
+                            }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"']/g, function (s) {
-            return ({
-                '&': '&amp;',
-                '<': '<',
-                '>': '>',
-                '"': '"',
-                "'": '&#39;'
-            })[s];
-        });
-    }
-</script>
+
+
+                            function searchUsers(query) {
+                                const q = query.toLowerCase();
+                                filteredData = userData.filter(d =>
+                                    (d.first_name || '').toLowerCase().includes(q) ||
+                                    (d.last_name || '').toLowerCase().includes(q) ||
+                                    (d.email || '').toLowerCase().includes(q) ||
+                                    (d.municipality || '').toLowerCase().includes(q) ||
+                                    (d.address || '').toLowerCase().includes(q) ||
+                                    (d.contact_number || '').toLowerCase().includes(q) ||
+                                    (d.usertype || '').toLowerCase().includes(q) ||
+                                    (d.status || '').toLowerCase().includes(q)
+                                );
+                                currentPage = 1;
+                                renderTable();
+                            }
+
+                            // Initialize event listeners
+                            function initEventListeners() {
+                                cancelBtn.addEventListener('click', closeModal);
+                                saveBtn.addEventListener('click', saveUser);
+                                closeSuccessBtn.addEventListener("click", closeSuccessModal);
+                                closeErrorBtn.addEventListener("click", closeErrorModal);
+
+                                modal.addEventListener('click', (e) => {
+                                    if (e.target.id === 'userModal') closeModal();
+                                });
+
+                                deleteModal.addEventListener('click', (e) => {
+                                    if (e.target.id === 'deleteModal') closeDeleteModal();
+                                });
+
+                                cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+                                confirmDeleteBtn.addEventListener('click', confirmDelete);
+
+                                searchInput.addEventListener('input', (e) => searchUsers(e.target.value));
+
+                                prevBtn.addEventListener('click', () => {
+                                    if (currentPage > 1) {
+                                        currentPage--;
+                                        renderTable();
+                                    }
+                                });
+
+                                nextBtn.addEventListener('click', () => {
+                                    if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
+                                        currentPage++;
+                                        renderTable();
+                                    }
+                                });
+
+                                // Status button event listeners
+                                statusButtons.forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        statusButtons.forEach(b => b.classList.remove('active'));
+                                        btn.classList.add('active');
+                                        selectedStatus = btn.getAttribute('data-status');
+                                    });
+                                });
+
+                                // Load municipalities for the select dropdown
+                                loadMunicipalities();
+                            }
+
+                            // Fetch data from API
+                            async function fetchUsers() {
+                                try {
+                                    const response = await fetch('api/users/list.php');
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        userData = result.data;
+                                        filteredData = [...userData];
+                                        renderTable();
+                                    } else {
+                                        console.error('Failed to fetch users:', result.error);
+                                    }
+                                } catch (error) {
+                                    console.error('Error fetching users:', error);
+                                }
+                            }
+
+
+
+                            // Load user data and update the dropdown
+                            async function loadUserData() {
+                                try {
+                                    const res = await fetch('api/users/current.php');
+                                    const data = await res.json();
+                                    if (data.success) {
+                                        Alpine.store('user', data.data);
+                                        updateUserDropdown(data.data);
+                                    }
+                                } catch (err) {
+                                    console.error('Failed to load user data:', err);
+                                }
+                            }
+
+                            // Utility function to escape HTML
+                            function escapeHtml(text) {
+                                const div = document.createElement('div');
+                                div.textContent = text;
+                                return div.innerHTML;
+                            }
+
+                            // Update the user dropdown with fetched data
+                            function updateUserDropdown(user) {
+                                const dropdown = document.querySelector('.dropdown.flex-shrink-0');
+                                if (dropdown) {
+                                    const triggerImg = dropdown.querySelector('a img');
+                                    const dropdownImg = dropdown.querySelector('ul li .flex-none img');
+                                    const nameSpan = dropdown.querySelector('ul li .truncate h4');
+                                    const emailA = dropdown.querySelector('ul li .truncate a');
+
+                                    if (triggerImg) triggerImg.src = user.profile_picture || 'assets/images/logo.jpg';
+                                    if (dropdownImg) dropdownImg.src = user.profile_picture || 'assets/images/logo.jpg';
+                                    if (nameSpan) {
+                                        nameSpan.innerHTML = `${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>`;
+                                    }
+                                    if (emailA) emailA.textContent = user.email;
+                                }
+                            }
+
+                            // Initialize the application
+                            async function init() {
+                                await fetchUsers();
+                                initEventListeners();
+                                loadUserData();
+                            }
+
+                            // Load municipalities for dropdown
+                            async function loadMunicipalities() {
+                                try {
+                                    const response = await fetch('api/municipality/list.php');
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        const select = document.getElementById('municipality');
+                                        select.innerHTML = '<option value="">Select Municipality</option>';
+                                        result.data.forEach(mun => {
+                                            const option = document.createElement('option');
+                                            option.value = mun.name;
+                                            option.textContent = mun.name;
+                                            select.appendChild(option);
+                                        });
+                                        console.log('Municipalities loaded:', result.data.length);
+                                    } else {
+                                        console.error('Failed to load municipalities:', result.error);
+                                    }
+                                } catch (error) {
+                                    console.error('Error loading municipalities:', error);
+                                }
+                            }
+
+                            // Initialize the application
+                            async function init() {
+                                await fetchUsers();
+                                initEventListeners();
+                                loadUserData();
+                                await loadMunicipalities();
+                            }
+
+                            // Start the application when DOM is loaded
+                            document.addEventListener('DOMContentLoaded', init);
+                            </script>
     </body>
 </html>

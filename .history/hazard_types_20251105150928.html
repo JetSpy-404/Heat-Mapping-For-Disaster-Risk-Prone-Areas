@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Hazard Data</title>
+        <title>Hazard Types</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/x-icon" href="favicon.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,62 +15,62 @@
         <link rel="stylesheet" type="text/css" media="screen" href="assets/css/table.css">
         <link rel="stylesheet" type="text/css" media="screen" href="assets/css/dashboard.css">
         <link defer="" rel="stylesheet" type="text/css" media="screen" href="assets/css/animate.css">
+        <style>
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.warning {
+            background: #f59e0b;
+        }
+
+        .notification .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 8px;
+            opacity: 0.8;
+        }
+
+        .notification .close-btn:hover {
+            opacity: 1;
+        }
+        </style>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
         <script src="assets/js/perfect-scrollbar.min.js"></script>
         <script defer="" src="assets/js/popper.min.js"></script>
         <script defer="" src="assets/js/tippy-bundle.umd.min.js"></script>
         <script defer="" src="assets/js/sweetalert.min.js"></script>
-        <!-- Added: table layout fixes to keep headers and cells aligned -->
-		<style>
-		.panel-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-		.icon-btn { background: none; border: none; padding: 4px; cursor: pointer; }
-
-		/* Notification Styles */
-		.notification {
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			background: #10b981;
-			color: white;
-			padding: 12px 16px;
-			border-radius: 8px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			z-index: 1000;
-			max-width: 300px;
-			font-size: 14px;
-			opacity: 0;
-			transform: translateY(-20px);
-			transition: all 0.3s ease;
-		}
-
-		.notification.show {
-			opacity: 1;
-			transform: translateY(0);
-		}
-
-		.notification.error {
-			background: #ef4444;
-		}
-
-		.notification.warning {
-			background: #f59e0b;
-		}
-
-		.notification .close-btn {
-			background: none;
-			border: none;
-			color: white;
-			font-size: 18px;
-			cursor: pointer;
-			margin-left: 8px;
-			opacity: 0.8;
-		}
-
-		.notification .close-btn:hover {
-			opacity: 1;
-		}
-		</style>
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
     </head>
 
     <body x-data="main" class="relative overflow-x-hidden font-nunito text-sm font-normal antialiased" :class="[ $store.app.sidebar ? 'toggle-sidebar' : '', $store.app.theme === 'dark' || $store.app.isDarkMode ?  'dark' : '', $store.app.menu, $store.app.layout,$store.app.rtlClass]">
@@ -193,7 +193,7 @@
                             </h2>
 
                                     <li class="nav-item">
-                                        <a href="hazard_types.php" class="group">
+                                        <a href="hazard_types.php" class="active group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" fill="currentColor"></path>
@@ -206,7 +206,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="hazard_data.php" class="active group">
+                                        <a href="hazard_data.php" class="group">
                                             <div class="flex items-center">
                                                 <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M4.97883 9.68508C2.99294 8.89073 2 8.49355 2 8C2 7.50645 2.99294 7.10927 4.97883 6.31492L7.7873 5.19153C9.77318 4.39718 10.7661 4 12 4C13.2339 4 14.2268 4.39718 16.2127 5.19153L19.0212 6.31492C21.0071 7.10927 22 7.50645 22 8C22 8.49355 21.0071 8.89073 19.0212 9.68508L16.2127 10.8085C14.2268 11.6028 13.2339 12 12 12C10.7661 12 9.77318 11.6028 7.7873 10.8085L4.97883 9.68508Z" fill="currentColor"></path>
@@ -282,14 +282,14 @@
             <!-- end sidebar section -->
 
             <div class="main-content flex flex-col min-h-screen">
-                               <!-- start header section -->
+                                <!-- start header section -->
                 <header class="z-40" :class="{'dark' : $store.app.semidark && $store.app.menu === 'horizontal'}">
                     <div class="shadow-sm">
                         <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
                             <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
                                 <a href="index.html" class="main-logo flex shrink-0 items-center">
                                     <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="assets/images/logo10.png" alt="image">
-                                    <span id="header-role" class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">Administrator</span>
+                                    <span class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">Administrator</span>
                                 </a>
 
                                 <a href="javascript:;" class="collapse-icon flex flex-none rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary ltr:ml-2 rtl:mr-2 dark:bg-dark/40 dark:text-[#d0d2d6] dark:hover:bg-dark/60 dark:hover:text-primary lg:hidden" @click="$store.app.toggleSidebar()">
@@ -476,39 +476,30 @@
                 <div x-data="finance">
                     <ul class="flex space-x-2 rtl:space-x-reverse">
                         <li>
-                            <a href="javascript:;" class="text-primary hover:underline">Hazard Data</a>
+                            <a href="javascript:;" class="text-primary hover:underline">Hazard Types</a>
                         </li>
                     </ul>
-					<div class="pt-5">
-
                     <div class="mb-5 overflow-x-auto">
-                                <div class="panel">
-                                    <div class="top-bar">
-                                    <input id="searchInput" class="form-input" type="text" placeholder="Search hazards..." />
-                                    <button id="addBtn" class="add-btn">
-                                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                                        Add Data
-                                    </button>
-                                    </div>
-
-                                    <div class="panel-table-wrapper">
-                    <table class="data-table table-responsive" aria-describedby="pageInfo">
-                        <thead>
-                            <tr>
+                        <div class="panel">
+                            <div class="top-bar">
+                            <input id="searchInput" class="form-input" type="text" placeholder="Search hazards..." />
+                            <button id="addBtn" class="add-btn">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                Add Hazard
+                            </button>
+                            </div>
+                            <table class="panel table-auto table-responsive overflow-x-auto">
+                            <thead>
+                                <tr>
                                 <th>ID</th>
-                                <th>Barangay</th>
-                                <th>Municipality</th>
-                                <th>Disaster Type</th>
-                                <th>Date</th>
-                                <th>Severity</th>
-                                <th>House Affected</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="panel" id="tableBody"></tbody>
-                    </table>
-                </div>
-
+                                <th>Hazard Name</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="overflow-x-auto" id="tableBody"></tbody>
+                            </table>
                             <div class="pagination">
                             <p id="pageInfo"></p>
                             <div class="pagination-controls">
@@ -521,39 +512,18 @@
                         <!-- Hazard Form Modal -->
                         <div id="hazardModal" class="modal">
                             <div class="modal-content">
-                            <h2 id="modalTitle">Add Data</h2>
+                            <h2 id="modalTitle">Add Hazard</h2>
                             <div class="form-group">
-                                <label for="barangay">Barangay</label>
-                                <select id="barangay" class="form-select">
-                                    <option value="" disabled selected>Select Barangay</option>
-                                </select>
-                            </div>
-                             <div class="form-group">
-                                <label for="municipality">Municipality</label>
-                                <select id="municipality" class="form-select">
-                                    <option value="" disabled selected>Select Municipality</option>
-                                </select>
+                                <label for="hazardName">Hazard Name</label>
+                                <input id="hazardName" type="text" />
                             </div>
                             <div class="form-group">
-                                <label for="disaster">Disaster Types</label>
-                                <select class="form-select" id="disaster" required>
-                                        <option value="" selected disabled>Select Disaster</option>
-                                        <option value="Geological">Landslide</option>
-                                        <option value="Hydrological">Floods</option>
-                                        <option value="Meteorological">Storm Surge</option>
-                                    </select>
+                                <label for="hazardDesc">Description</label>
+                                <textarea id="hazardDesc" rows="3" class="form-textarea" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="date">Date</label>
-                                <input id="date" type="date" />
-                            </div>
-                            <div class="form-group">
-                                <label for="severity">Severity</label>
-                                <input id="severity" type="text" />
-                            </div>
-                            <div class="form-group">
-                                <label for="houseAffected">House Affected</label>
-                                <input id="houseAffected" type="text" />
+                                <label for="hazardCat">Category</label>
+                                <input id="hazardCat" type="text" />
                             </div>
                             <div class="modal-actions">
                                 <button id="cancelBtn" class="btn cancel">Cancel</button>
@@ -574,7 +544,7 @@
                                 </svg>
                             </div>
                             <h2>Delete Hazard</h2>
-                            <p class="delete-modal-text">Are you sure you want to delete data <strong id="deleteItemName"></strong>? This action cannot be undone.</p>
+                            <p class="delete-modal-text">Are you sure you want to delete <strong id="deleteItemName"></strong>? This action cannot be undone.</p>
                             <div class="modal-actions">
                                 <button id="cancelDeleteBtn" class="btn cancel">Cancel</button>
                                 <button id="confirmDeleteBtn" class="btn delete">Delete</button>
@@ -585,13 +555,13 @@
                         <!-- Notification Container -->
                         <div id="notificationContainer"></div>
 
-    </div>
-                <!-- end main content section -->
+            <!-- end main content section -->
             </div>
             </div>
             </div>
-        </div>
 
+        </div>
+        <script src="https://unpkg.com/lucide@latest"></script>
         <script src="assets/js/alpine-collaspe.min.js"></script>
         <script src="assets/js/alpine-persist.min.js"></script>
         <script defer="" src="assets/js/alpine-ui.min.js"></script>
@@ -600,15 +570,15 @@
         <script src="assets/js/custom.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <script>
-    // Application state (will be loaded from server)
+
+   <script>
+    // Application state (loaded from server)
     let hazardData = [];
     let filteredData = [];
     let currentPage = 1;
     const rowsPerPage = 5;
     let editId = null;
     let deleteId = null;
-    let allBarangays = [];
 
     // DOM elements
     const tableBody = document.getElementById("tableBody");
@@ -620,12 +590,9 @@
     const modal = document.getElementById("hazardModal");
     const deleteModal = document.getElementById("deleteModal");
     const modalTitle = document.getElementById("modalTitle");
-    const barangay = document.getElementById("barangay");
-    const municipality = document.getElementById("municipality");
-    const disaster = document.getElementById("disaster");
-    const date = document.getElementById("date");
-    const severity = document.getElementById("severity");
-    const houseAffected = document.getElementById("houseAffected");
+    const hazardName = document.getElementById("hazardName");
+    const hazardDesc = document.getElementById("hazardDesc");
+    const hazardCat = document.getElementById("hazardCat");
     const cancelBtn = document.getElementById("cancelBtn");
     const saveBtn = document.getElementById("saveBtn");
     const saveBtnText = document.getElementById("saveBtnText");
@@ -682,19 +649,15 @@
         const pageData = filteredData.slice(start, end);
 
         if (pageData.length === 0) {
-            // colspan updated to match 8 columns
-            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">No hazards found.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px;">No hazards found.</td></tr>`;
         } else {
             pageData.forEach(item => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td>${item.id}</td>
-                    <td>${item.barangay}</td>
-                    <td>${item.municipality}</td>
-                    <td>${item.disaster_type}</td>
-                    <td>${item.date}</td>
-                    <td>${item.severity}</td>
-                    <td>${item.houses_affected || ''}</td>
+                    <td>${item.name}</td>
+                    <td>${item.description}</td>
+                    <td>${item.category}</td>
                     <td>
                         <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Edit hazard">${getEditIcon()}</button>
                         <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Delete hazard">${getTrashIcon()}</button>
@@ -730,23 +693,14 @@
     function openModal(item = null) {
         modal.classList.add("active");
         if (item) {
-            modalTitle.textContent = "Edit Data";
-            // set select values to ids (if available)
-            barangay.value = item.barangay_id || '';
-            municipality.value = item.municipality_id || '';
-            disaster.value = item.hazard_type_id || '';
-            date.value = item.date;
-            severity.value = item.severity || '';
-            houseAffected.value = item.houses_affected || '';
+            modalTitle.textContent = "Edit Hazard";
+            hazardName.value = item.name;
+            hazardDesc.value = item.description;
+            hazardCat.value = item.category;
             editId = item.id;
         } else {
-            modalTitle.textContent = "Add Data";
-            barangay.value = "";
-            municipality.value = "";
-            disaster.value = "";
-            date.value = "";
-            severity.value = "";
-            houseAffected.value = "";
+            modalTitle.textContent = "Add Hazard";
+            hazardName.value = hazardDesc.value = hazardCat.value = "";
             editId = null;
         }
         saveBtn.disabled = false;
@@ -756,7 +710,7 @@
 
     function openDeleteModal(item) {
         deleteModal.classList.add("active");
-        deleteItemName.textContent = item.id;
+        deleteItemName.textContent = item.name;
         deleteId = item.id;
     }
 
@@ -769,15 +723,12 @@
     }
 
     async function saveHazard() {
-        const barangayId = parseInt(barangay.value || 0, 10);
-        const municipalityId = parseInt(municipality.value || 0, 10);
-        const hazardTypeId = parseInt(disaster.value || 0, 10);
-        const eventDate = date.value;
-        const sev = severity.value.trim();
-        const houses = houseAffected.value.trim();
+        const name = hazardName.value.trim();
+        const desc = hazardDesc.value.trim();
+        const cat = hazardCat.value.trim();
 
-        if (barangayId <= 0 || municipalityId <= 0 || hazardTypeId <= 0 || !eventDate) {
-            alert('Please fill required fields (barangay, municipality, disaster type and date).');
+        if (!name || !desc || !cat) {
+            alert("All fields are required!");
             return;
         }
 
@@ -785,41 +736,22 @@
         saveBtnText.textContent = "Saving...";
         saveBtnSpinner.style.display = "inline-block";
 
-        const payload = {
-            barangay_id: barangayId,
-            municipality_id: municipalityId,
-            hazard_type_id: hazardTypeId,
-            event_date: eventDate,
-            severity: sev,
-            houses_affected: houses,
-        };
-
+        const payload = { name, description: desc, category: cat };
         try {
-            let res;
+            let res, json;
             if (editId) {
                 payload.id = editId;
-                res = await fetch('api/hazard/update.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                res = await fetch('api/hazard_type/update.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                json = await res.json();
             } else {
-                res = await fetch('api/hazard/create.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                res = await fetch('api/hazard_type/create.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                json = await res.json();
             }
-
-            const json = await res.json();
             if (!res.ok || !json.success) {
-                const msg = json && json.error ? json.error : 'Save failed';
-                showNotification(msg, 'error');
+                showNotification(json.error || 'Save failed', 'error');
                 return;
             }
-
-            showNotification(editId ? 'Hazard data updated successfully' : 'Hazard data added successfully');
-            // refresh list from server
+            showNotification(editId ? 'Hazard type updated successfully' : 'Hazard type added successfully');
             await loadHazards();
             closeModal();
         } catch (err) {
@@ -831,122 +763,41 @@
         }
     }
 
-    async function confirmDelete() {
-        if (!deleteId) return;
-        try {
-            const res = await fetch('api/hazard/delete.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: deleteId })
-            });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                showNotification(json.error || 'Delete failed', 'error');
-                return;
+    function confirmDelete() {
+        (async function () {
+            if (!deleteId) return;
+            try {
+                const res = await fetch('api/hazard_type/delete.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: deleteId }) });
+                const json = await res.json();
+                if (!res.ok || !json.success) {
+                    showNotification(json.error || 'Delete failed', 'error');
+                    return;
+                }
+                showNotification('Hazard type deleted successfully');
+                await loadHazards();
+                closeDeleteModal();
+            } catch (err) {
+                showNotification('Error: ' + err.message, 'error');
             }
-            showNotification('Hazard data deleted successfully');
-            await loadHazards();
-            closeDeleteModal();
-        } catch (err) {
-            showNotification('Error: ' + err.message, 'error');
-        }
+        })();
     }
 
     function searchHazards(query) {
         const q = query.toLowerCase();
         filteredData = hazardData.filter(d =>
-            (d.barangay || '').toLowerCase().includes(q) ||
-            (d.municipality || '').toLowerCase().includes(q) ||
-            (d.disaster_type || '').toLowerCase().includes(q) ||
-            (d.date || '').toLowerCase().includes(q) ||
-            (d.severity || '').toLowerCase().includes(q) ||
-            (d.houses_affected || '').toLowerCase().includes(q)
+            d.name.toLowerCase().includes(q) ||
+            d.description.toLowerCase().includes(q) ||
+            d.category.toLowerCase().includes(q)
         );
         currentPage = 1;
         renderTable();
-    }
-
-    // Load helper data for selects
-    async function loadSelects() {
-        try {
-            const [mRes, bRes, htRes] = await Promise.all([
-                fetch('api/municipality/list.php'),
-                fetch('api/barangay/list.php'),
-                fetch('api/hazard_type/list.php'),
-            ]);
-            const mJson = await mRes.json();
-            const bJson = await bRes.json();
-            const htJson = await htRes.json();
-
-            if (mJson.success) {
-                municipality.innerHTML = '<option value="" disabled selected>Select Municipality</option>' + mJson.data.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
-            }
-            if (bJson.success) {
-                allBarangays = bJson.data || [];
-                barangay.innerHTML = '<option value="" disabled selected>Select Barangay</option>' + allBarangays.map(b => `<option value="${b.id}" data-municipality="${b.municipality_id}">${escapeHtml(b.name)}</option>`).join('');
-            }
-            if (htJson.success) {
-                disaster.innerHTML = '<option value="" disabled selected>Select Disaster</option>' + htJson.data.map(h => `<option value="${h.id}">${escapeHtml(h.name)}</option>`).join('');
-            }
-        } catch (err) {
-            console.error('Failed to load selects', err);
-        }
-    }
-
-    // small helper to avoid injecting HTML
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"]+/g, function (s) {
-            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[s];
-        });
-    }
-
-    // Load hazards from server
-    async function loadHazards() {
-        try {
-            const res = await fetch('api/hazard/list.php');
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                console.error('Failed to load hazards', json);
-                hazardData = [];
-            } else {
-                hazardData = json.data.map(r => ({
-                    id: parseInt(r.id, 10),
-                    barangay_id: r.barangay_id ? parseInt(r.barangay_id, 10) : null,
-                    barangay: r.barangay,
-                    municipality_id: r.municipality_id ? parseInt(r.municipality_id, 10) : null,
-                    municipality: r.municipality,
-                    hazard_type_id: r.hazard_type_id ? parseInt(r.hazard_type_id, 10) : null,
-                    disaster_type: r.disaster_type,
-                    date: r.date,
-                    severity: r.severity,
-                    houses_affected: r.houses_affected,
-                    created_at: r.created_at,
-                }));
-                filteredData = [...hazardData];
-            }
-            currentPage = 1;
-            renderTable();
-        } catch (err) {
-            console.error('Error loading hazards', err);
-            hazardData = [];
-            filteredData = [];
-            renderTable();
-        }
     }
 
     // Initialize event listeners
     function initEventListeners() {
         addBtn.addEventListener('click', () => openModal());
         cancelBtn.addEventListener('click', closeModal);
-        saveBtn.addEventListener('click', saveHazard);
-        municipality.addEventListener('change', () => {
-            const mid = municipality.value;
-            // filter barangays
-            const options = ['<option value="" disabled selected>Select Barangay</option>'];
-            allBarangays.filter(b => String(b.municipality_id) === String(mid)).forEach(b => options.push(`<option value="${b.id}">${escapeHtml(b.name)}</option>`));
-            barangay.innerHTML = options.join('');
-        });
+        saveBtn.addEventListener('click', (e) => { saveHazard(); });
         
         modal.addEventListener('click', (e) => {
             if (e.target.id === 'hazardModal') closeModal();
@@ -979,8 +830,28 @@
     // Initialize the application
     function init() {
         initEventListeners();
-        loadSelects();
         loadHazards();
+    }
+
+    // Load hazard types from server
+    async function loadHazards() {
+        try {
+            const res = await fetch('api/hazard_type/list.php');
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                hazardData = [];
+            } else {
+                hazardData = json.data.map(r => ({ id: parseInt(r.id, 10), name: r.name, description: r.description, category: r.category }));
+                filteredData = [...hazardData];
+            }
+            currentPage = 1;
+            renderTable();
+        } catch (err) {
+            console.error('Failed to load hazard types', err);
+            hazardData = [];
+            filteredData = [];
+            renderTable();
+        }
     }
 
     // Load user data and update the dropdown
@@ -991,7 +862,6 @@
             if (data.success) {
                 Alpine.store('user', data.data);
                 updateUserDropdown(data.data);
-                updateSidebarRole(data.data.role);
             }
         } catch (err) {
             console.error('Failed to load user data:', err);
@@ -1013,23 +883,6 @@
                 nameSpan.innerHTML = `${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>`;
             }
             if (emailA) emailA.textContent = user.email;
-        }
-    }
-
-    // Update the sidebar role display
-    function updateSidebarRole(role) {
-        const sidebarRoleElement = document.getElementById('sidebar-role');
-        if (sidebarRoleElement) {
-            // Capitalize the first letter of the role
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            sidebarRoleElement.textContent = displayRole;
-        }
-
-        // Also update the header role display
-        const headerRoleElement = document.getElementById('header-role');
-        if (headerRoleElement) {
-            const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-            headerRoleElement.textContent = displayRole;
         }
     }
 
