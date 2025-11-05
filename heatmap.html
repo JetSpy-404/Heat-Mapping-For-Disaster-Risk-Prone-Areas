@@ -12,7 +12,7 @@
         <link href="css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" media="screen" href="assets/css/perfect-scrollbar.min.css">
         <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css">
-        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/dashboard.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/heatmap.css">
         <link defer="" rel="stylesheet" type="text/css" media="screen" href="assets/css/animate.css">
         <script src="assets/js/perfect-scrollbar.min.js"></script>
         <script defer="" src="assets/js/popper.min.js"></script>
@@ -521,176 +521,6 @@
             </div>
             </div>
         </div>
-        <style>
-        .map-wrapper {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            overflow: hidden;
-            height: 650px
-        }
-        .map-controls-panel {
-            width: 280px;
-            min-width: 280px;
-            background-color: #00d9b9;
-            padding: 20px;
-            border-radius: 5px;
-            height: 650px;
-            overflow-y: auto;
-        }
-        
-        .panel-header {
-            font-weight: 600;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e8eff5;
-            margin-bottom: 20px;
-        }
-
-        .map-container {
-            flex: 1;
-            min-width: 0;
-            height: 730px;
-            border-radius: 5px;
-            position: relative;
-            
-        }
-        #biliranMap {
-            height: 100%;
-            width: 100%;
-            border-radius: 5px;
-        }
-        .map-type-dropdown {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            z-index: 1000;
-        }
-
-        .map-type-dropdown .dropdown-toggle {
-            padding: 5px 10px;
-        }
-
-        .map-type-dropdown .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 4px;
-            padding: 5px;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .map-type-dropdown:hover .dropdown-content {
-            display: flex;
-        }
-
-        /* Make sure buttons in dropdown take full width */
-        .map-type-dropdown .dropdown-content button {
-            width: 100%;
-            text-align: left;
-        }
-         /* Updated legend styles */
-        .legend {
-            position: absolute;
-            bottom: 90px;
-            left: 20px;
-            z-index: 1000;
-            background-color: rgba(42, 48, 56, 0.9);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-            font-size: 14px;
-            max-width: 200px;
-        }
-        .legend i {
-            width: 18px;
-            height: 18px;
-            float: left;
-            margin-right: 8px;
-            opacity: 0.7;
-            border-radius: 3px;
-        }
-        .legend-title {
-            margin-bottom: 8px;
-            font-weight: bold;
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-        }
-        .legend-item {
-            margin-bottom: 3px;
-        }
-        .form-select, .form-control {
-            border: 1px solid #495057;
-        }
-        .form-select:focus, .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        
-        /* Custom pointer marker */
-        .custom-pointer {
-            background-color: #00ff00;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 1001;
-        }
-
-        .btn1 {
-            border-radius: 8px;
-            padding: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-        .btn-warning {
-            background: linear-gradient(to right, #ff9a3d, #ff7b00);
-            border: none;
-            color: white;
-        }
-        .btn-warning:hover {
-            background: linear-gradient(to right, #ff7b00, #ff6600);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(255, 123, 0, 0.3);
-        }
-        .btn-success {
-            background: linear-gradient(to right, #3d95ff, #007bff);
-            border: none;
-            color: white;
-            margin-top: 4px;
-        }
-        .btn-success:hover {
-            background: linear-gradient(to right, #007bff, #0066cc);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .map-wrapper {
-                flex-direction: column;
-                height: 800px;
-            }
-            .map-controls-panel {
-                width: 100%;
-                height: auto;
-                max-height: 400px;
-            }
-            .map-container {
-                height: auto;
-            }
-            .legend {
-                bottom: 20px;
-            }
-        }
-    </style>
         <script src="assets/js/alpine-collaspe.min.js"></script>
         <script src="assets/js/alpine-persist.min.js"></script>
         <script defer="" src="assets/js/alpine-ui.min.js"></script>
@@ -703,164 +533,559 @@
         <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            
-        // Hazard severity colors
-    const hazardSusceptibilityColors = {
-        very_high: '#bc00c0', // Purple
-        high: '#ff0000',     // Red
-        moderate:  '#eee200', // Yellow
-        low: '#0bd900'       // Green
-    };
+// Hazard severity colors
+const hazardSusceptibilityColors = {
+    very_high: '#bc00c0', // Purple
+    high: '#ff0000',     // Red
+    moderate:  '#eee200', // Yellow
+    low: '#0bd900'       // Green
+};
 
-    // Heatmap gradient
-    const heatmapGradient = {
-        0.3: hazardSusceptibilityColors.low,    // Low
-        0.6: hazardSusceptibilityColors.moderate,  // Moderate
-        0.8: hazardSusceptibilityColors.high,    // High
-        1.0: hazardSusceptibilityColors.very_high   // Very High
-    };
+// Notification styles
+const notificationStyles = `
+.notification {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    padding: 15px 20px !important;
+    border-radius: 5px !important;
+    color: white !important;
+    font-weight: bold !important;
+    z-index: 10000 !important;
+    opacity: 0 !important;
+    transform: translateX(100%) !important;
+    transition: all 0.3s ease !important;
+    max-width: 300px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+.notification.show {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+}
+.notification.success {
+    background-color: #10b981 !important;
+}
+.notification.error {
+    background-color: #ef4444 !important;
+}
+.notification.danger {
+    background-color: #ef4444 !important;
+}
+.notification.warning {
+    background-color: #f59e0b !important;
+}
+.notification.info {
+    background-color: #3b82f6 !important;
+}
+.notification .close-btn {
+    float: right !important;
+    margin-left: 10px !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+    color: white !important;
+}
+`;
 
-    // Update the legend when hazard type is selected
-    function updateLegend(hazardType) {
-        const legendContent = document.getElementById('legendContent');
-        
-        if (!hazardType) {
-            legendContent.innerHTML = '';
-        } else {
-            // Show severity levels for selected hazard type
-            const hazardName = $('#hazardSelect option:selected').text();
-            legendContent.innerHTML = `
-                <div class="legend-title">${hazardName} Susceptibility</div>
-                <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.very_high};"></i> Very High</div>
-                <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.high};"></i> High</div>
-                <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.moderate};"></i> Moderate</div>
-                <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.low};"></i> Low</div>
-            `;
-        }
+// Inject styles into the document
+const styleElement = document.createElement('style');
+styleElement.textContent = notificationStyles;
+document.head.appendChild(styleElement);
+
+// Heatmap gradient
+const heatmapGradient = {
+    0.3: hazardSusceptibilityColors.low,    // Low
+    0.6: hazardSusceptibilityColors.moderate,  // Moderate
+    0.8: hazardSusceptibilityColors.high,    // High
+    1.0: hazardSusceptibilityColors.very_high   // Very High
+};
+
+// Global variables
+let currentHeatmapLayer = null;
+
+// Update the legend when hazard type is selected
+function updateLegend(hazardType) {
+    const legendContent = document.getElementById('legendContent');
+
+    if (!hazardType) {
+        legendContent.innerHTML = '';
+    } else {
+        // Show severity levels for selected hazard type
+        const hazardName = $('#hazardSelect option:selected').text();
+        legendContent.innerHTML = `
+            <div class="legend-title">${hazardName} Susceptibility</div>
+            <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.very_high};"></i> Very High</div>
+            <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.high};"></i> High</div>
+            <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.moderate};"></i> Moderate</div>
+            <div class="legend-item"><i style="background: ${hazardSusceptibilityColors.low};"></i> Low</div>
+        `;
+    }
+}
+
+// Enhanced loadHeatmapData function with proper error handling
+function loadHeatmapData(hazardType, municipality = null, barangay = null) {
+    // Clear existing layers first
+    clearHeatmapLayers();
+
+    // If no hazard type selected, return early
+    if (!hazardType) {
+        updateLegend(null);
+        return;
     }
 
+    // Show loading state
+    showLoadingState(true);
 
-    // Hazard select change event
-    $('#hazardSelect').change(function() {
-        const selectedHazard = $(this).val();
-        updateLegend(selectedHazard);
-        loadHeatmapData(selectedHazard);
-    });
+    try {
+        // Only load barangay-specific data
+        if (barangay && municipality) {
+            // Load specific barangay data
+            loadBarangaySpecificData(hazardType, municipality, barangay);
+        } else {
+            // If no barangay selected, show notification
+            showLoadingState(false);
+            showNotification('Please select a barangay to view hazard data.', 'info');
+            updateLegend(null);
+        }
+    } catch (error) {
+        console.error('Error in loadHeatmapData:', error);
+        showLoadingState(false);
+        showError('Failed to process heatmap data request.');
+    }
+}
 
-    // Initialize the legend
-    updateLegend(null);
+// Load data for a specific barangay with enhanced error handling
+function loadBarangaySpecificData(hazardType, municipality, barangay) {
+    // Validate inputs
+    if (!municipality || !barangay) {
+        throw new Error('Municipality and barangay are required for barangay-specific data');
+    }
 
-    // Initialize required scripts
-    $(document).ready(function() {
-        // Load required scripts
-        if (!window.L.HeatLayer) {
-            const heatScript = document.createElement('script');
-            heatScript.src = 'assets/js/heatmaps.js';
-            document.head.appendChild(heatScript);
+    // Construct the path to barangay-specific GeoJSON file based on your structure
+    const barangayDataPath = `assets/data/${municipality.toLowerCase()}/${barangay.toLowerCase()}_${hazardType}.geojson`;
+
+    console.log(`Attempting to load barangay data from: ${barangayDataPath}`);
+
+    // Add cache-busting parameter to ensure fresh data
+    const timestamp = new Date().getTime();
+    const urlWithCacheBust = `${barangayDataPath}?t=${timestamp}`;
+
+    fetch(urlWithCacheBust, {
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Barangay data not found (HTTP ${response.status})`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Validate GeoJSON structure
+        if (!data || !data.features || !Array.isArray(data.features)) {
+            throw new Error('Invalid GeoJSON format: missing features array');
+        }
+
+        // Check if data has actual features (not empty)
+        if (data.features.length === 0) {
+            throw new Error('Barangay data file exists but contains no features');
+        }
+
+        console.log(`Successfully loaded barangay data for ${barangay}`);
+        displayHeatmapData(data, municipality, barangay, hazardType);
+        showLoadingState(false);
+    })
+    .catch(error => {
+        console.warn(`Barangay data load failed for ${barangay}:`, error.message);
+        
+        // Clear any existing heatmap
+        clearHeatmapLayers();
+        
+        // Show specific notification based on error type
+        if (error.message.includes('not found') || error.message.includes('HTTP 404')) {
+            showNotification(`No ${hazardType} data available for Barangay ${barangay}.`, 'warning');
+        } else if (error.message.includes('no features')) {
+            showNotification(`No ${hazardType} hazard data found for Barangay ${barangay}.`, 'warning');
+        } else {
+            showNotification(`Failed to load ${hazardType} data for Barangay ${barangay}.`, 'warning');
         }
         
-        if (!window.turf) {
-            const turfScript = document.createElement('script');
-            turfScript.src = 'assets/js/turf.min.js';
-            document.head.appendChild(turfScript);
-        }
-    });
-
-    // Initialize the map centered on Biliran
-    const map = L.map('biliranMap').setView([11.5833, 124.4642], 10);
-    
-    // Base maps
-    const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    
-    const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    
-    const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-
-    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
-
-    const terrainMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors'
-    });
-
-    // Global variables
-    let heatmapLayer = null;
-    // Add default base layer
-    terrainMap.addTo(map);
-
-    // Heatmap functions
-function createHeatmap(data) {
-    const heatData = data.features.map(feature => {
-        const center = window.turf?.centerOfMass?.(feature) || { geometry: { coordinates: [0, 0] } };
-        const intensity = feature.properties.intensity || feature.properties.value || 1;
-        return [center.geometry.coordinates[1], center.geometry.coordinates[0], intensity];
-    });
-
-    return L.heatLayer(heatData, {
-        radius: 20,
-        blur: 15,
-        maxZoom: 17,
-        minOpacity: 0.5,
-        gradient: heatmapGradient
+        updateLegend(null);
+        showLoadingState(false);
     });
 }
 
-function loadHeatmapData(hazardType) {
-    const heatmapFiles = {
-        flood: 'assets/js/flood.geojson',
-        landslide: 'assets/js/landslide.geojson',
-        storm: 'assets/js/storm_surge.geojson'
-    };
-    
-    if (heatmapFiles[hazardType]) {
-        fetch(heatmapFiles[hazardType])
-            .then(response => response.json())
-            .then(data => {
-                // Remove existing heatmap layer if it exists
-                if (heatmapLayer && map.hasLayer(heatmapLayer)) {
-                    map.removeLayer(heatmapLayer);
+// Display heatmap data on the map with enhanced error handling
+function displayHeatmapData(data, municipality, barangay, hazardType) {
+    try {
+        // Clear existing layers first
+        clearHeatmapLayers();
+
+        if (!data || !data.features || data.features.length === 0) {
+            showNotification('No heatmap data available for the selected area.', 'warning');
+            return;
+        }
+
+        // Validate and prepare heatmap data with intensity based on LH values
+        const heatData = data.features.map(feature => {
+            try {
+                if (!feature.geometry || !feature.geometry.coordinates) {
+                    console.warn('Invalid feature geometry:', feature);
+                    return null;
                 }
-                heatmapLayer = createHeatmap(data);
-                if (heatmapLayer) heatmapLayer.addTo(map);
-            })
-            .catch(console.error);
-    } else if (heatmapLayer) {
-        // Remove heatmap layer if no hazard type is selected
-        if (map.hasLayer(heatmapLayer)) {
-            map.removeLayer(heatmapLayer);
+
+                let lat, lng;
+
+                // Handle different geometry types
+                if (feature.geometry.type === 'Point') {
+                    [lng, lat] = feature.geometry.coordinates;
+                } else {
+                    // For polygons and other geometries, use center of mass
+                    let center;
+                    try {
+                        center = window.turf?.centerOfMass?.(feature);
+                    } catch (e) {
+                        console.warn('Error calculating center of mass:', e, feature);
+                        center = null;
+                    }
+                    if (!center) {
+                        center = { geometry: { coordinates: [124.4642, 11.5833] } };
+                    }
+                    [lng, lat] = center.geometry.coordinates;
+                }
+
+                // Use LH value for intensity (normalize to 0-1 range)
+                const lhValue = feature.properties?.LH || 1;
+                const intensity = Math.min(lhValue / 3, 1); // Normalize since max LH is 3
+
+                // Validate coordinates
+                if (typeof lat !== 'number' || typeof lng !== 'number' ||
+                    lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    console.warn('Invalid coordinates:', { lat, lng, feature });
+                    return null;
+                }
+
+                return [lat, lng, intensity];
+            } catch (error) {
+                console.warn('Error processing feature:', error, feature);
+                return null;
+            }
+        }).filter(point => point !== null); // Remove invalid points
+
+        if (heatData.length === 0) {
+            showNotification('No valid heatmap points found in the data.', 'warning');
+            return;
         }
-        heatmapLayer = null;
+
+        // Create heatmap layer with appropriate radius settings
+        currentHeatmapLayer = L.heatLayer(heatData, {
+            radius: getRadiusForZoom(map.getZoom()),
+            blur: 15, // Increased blur for smoother heatmap
+            maxZoom: 17,
+            minOpacity: 0.4,
+            maxOpacity: 0.8,
+            gradient: heatmapGradient
+        });
+
+        currentHeatmapLayer.addTo(map);
+
+        // Update map view to fit the heatmap data
+        const bounds = getHeatmapBounds(heatData);
+        if (bounds) {
+            map.fitBounds(bounds, { padding: [20, 20] });
+        }
+
+        // Highlight selected boundary using existing boundariesLayer
+        if (municipality || barangay) {
+            highlightSelectedBoundary(municipality, barangay);
+        }
+
+        // Update legend
+        updateLegend(hazardType);
+
+        // Show data summary
+        showDataSummary(heatData.length, municipality, barangay);
+
+        // Show success notification
+        showNotification('Heatmap data loaded successfully!', 'success');
+
+    } catch (error) {
+        console.error('Error displaying heatmap data:', error);
+        showError('Failed to display heatmap data. The data format may be invalid.');
     }
 }
 
-    // Layer group for boundaries
-    const boundariesLayer = L.layerGroup().addTo(map);
-
-    // Add this to your script section
-    document.getElementById('mapTypeToggle').addEventListener('click', function() {
-        const dropdown = document.querySelector('.map-type-dropdown .dropdown-content');
-        if (dropdown.style.display === 'flex') {
-            dropdown.style.display = 'none';
-        } else {
-            dropdown.style.display = 'flex';
-        }
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const dropdown = document.querySelector('.map-type-dropdown');
-        if (!dropdown.contains(event.target)) {
-            document.querySelector('.map-type-dropdown .dropdown-content').style.display = 'none';
-        }
+// Helper function to calculate bounds from heatmap data
+function getHeatmapBounds(heatData) {
+    if (!heatData || heatData.length === 0) return null;
+    
+    let minLat = Infinity, maxLat = -Infinity;
+    let minLng = Infinity, maxLng = -Infinity;
+    
+    heatData.forEach(point => {
+        const [lat, lng] = point;
+        minLat = Math.min(minLat, lat);
+        maxLat = Math.max(maxLat, lat);
+        minLng = Math.min(minLng, lng);
+        maxLng = Math.max(maxLng, lng);
     });
     
+    return [[minLat, minLng], [maxLat, maxLng]];
+}
+
+// Clear existing heatmap layers
+function clearHeatmapLayers() {
+    if (currentHeatmapLayer) {
+        if (map.hasLayer(currentHeatmapLayer)) {
+            map.removeLayer(currentHeatmapLayer);
+        }
+        currentHeatmapLayer = null;
+    }
+
+    // Additional cleanup for any orphaned heat layers
+    map.eachLayer((layer) => {
+        if (layer instanceof L.HeatLayer) {
+            map.removeLayer(layer);
+        }
+    });
+}
+
+// Highlight selected boundary using the existing boundariesLayer
+function highlightSelectedBoundary(municipality, barangay) {
+    // Clear existing boundaries first
+    boundariesLayer.clearLayers();
+
+    try {
+        if (barangay && municipality && municipalities[municipality]) {
+            const barangayData = municipalities[municipality].barangays.find(
+                b => b.name.toLowerCase() === barangay.toLowerCase()
+            );
+
+            if (barangayData && barangayData.boundary) {
+                const boundary = L.polygon(barangayData.boundary, {
+                    color: '#ff0000',
+                    weight: 3,
+                    fillColor: '#ff0000',
+                    fillOpacity: 0.0
+                }).addTo(boundariesLayer);
+
+                // Fit map to the barangay boundary
+                map.fitBounds(boundary.getBounds());
+                console.log(`Highlighted barangay boundary: ${barangay}`);
+            }
+        } else if (municipality && municipalities[municipality]) {
+            const boundary = L.polygon(municipalities[municipality].boundary, {
+                color: '#ff0000',
+                weight: 3,
+                fillColor: '#ff0000',
+                fillOpacity: 0.1
+            }).addTo(boundariesLayer);
+
+            // Fit map to the municipality boundary
+            map.fitBounds(boundary.getBounds());
+            console.log(`Highlighted municipality boundary: ${municipality}`);
+        }
+    } catch (error) {
+        console.error('Error highlighting boundary:', error);
+        showNotification('Failed to highlight boundary. Boundary data may be invalid.', 'warning');
+    }
+}
+
+// Dynamic radius based on zoom level - IMPROVED with larger values
+function getRadiusForZoom(zoom) {
+    const radiusMap = {
+        8: 50,
+        9: 45,
+        10: 40,
+        11: 35,
+        12: 30,
+        13: 25,
+        14: 20,
+        15: 15,
+        16: 12,
+        17: 10,
+        18: 8,
+        19: 6,
+        20: 4
+    };
+    return radiusMap[zoom] || 25;
+}
+
+// Enhanced UI feedback functions
+function showLoadingState(show) {
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        if (show) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+            submitBtn.disabled = true;
+        } else {
+            submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit';
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+function showDataSummary(featureCount, municipality, barangay) {
+    let locationText = barangay ? `Barangay ${barangay}, ${municipality}` : `Municipality of ${municipality}`;
+
+    const message = `Displaying ${featureCount} heatmap points for ${locationText}`;
+    console.log(message);
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification using custom styles
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        ${message}
+        <span class="close-btn">&times;</span>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Trigger show animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    // Close button functionality
+    const closeBtn = notification.querySelector('.close-btn');
+    closeBtn.addEventListener('click', () => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    });
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.classList.contains('show')) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+function showError(message) {
+    console.error('Heatmap Error:', message);
+    showNotification(message, 'danger');
+}
+
+// Data validation and debugging functions
+function validateMunicipalitiesData() {
+    console.log('=== Validating Municipalities Data ===');
+    Object.keys(municipalities).forEach(mun => {
+        console.log(`Municipality: ${mun}`);
+        if (municipalities[mun].barangays) {
+            console.log(`  Barangays: ${municipalities[mun].barangays.length}`);
+        }
+    });
+}
+
+function checkDataFiles() {
+    console.log('=== Checking Data Files ===');
+    // Since we're only using barangay data, we don't need to check province files
+    console.log('Barangay-specific data files will be checked when selected');
+}
+
+// Initialize required scripts with error handling
+$(document).ready(function() {
+    console.log('Initializing heatmap system...');
+
+    // Validate data structure
+    validateMunicipalitiesData();
+
+    // Check data files
+    checkDataFiles();
+
+    // Load required scripts with error handling
+    const loadScript = (src, globalVar) => {
+        return new Promise((resolve, reject) => {
+            if (window[globalVar]) {
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+            document.head.appendChild(script);
+        });
+    };
+
+    Promise.all([
+        loadScript('assets/js/heatmaps.js', 'L.HeatLayer').catch(error => {
+            console.warn('Heatmaps.js not loaded:', error.message);
+        }),
+        loadScript('assets/js/turf.min.js', 'turf').catch(error => {
+            console.warn('Turf.js not loaded:', error.message);
+        })
+    ]).finally(() => {
+        // Initialize event listeners regardless of script loading
+        initializeEventListeners();
+        console.log('Heatmap system initialized');
+    });
+});
+
+// Initialize the map centered on Biliran
+const map = L.map('biliranMap').setView([11.5833, 124.4642], 10);
+
+// Base maps with proper attributions
+const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+});
+
+const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://hot.openstreetmap.org">Humanitarian OpenStreetMap</a>'
+});
+
+const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
+const terrainMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors'
+});
+
+// Global variables
+let heatmapLayer = null;
+
+// Add default base layer - this will automatically show the proper attribution
+terrainMap.addTo(map);
+
+// Layer group for boundaries
+const boundariesLayer = L.layerGroup().addTo(map);
+
+// Add this to your script section
+document.getElementById('mapTypeToggle').addEventListener('click', function() {
+    const dropdown = document.querySelector('.map-type-dropdown .dropdown-content');
+    if (dropdown.style.display === 'flex') {
+        dropdown.style.display = 'none';
+    } else {
+        dropdown.style.display = 'flex';
+    }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.map-type-dropdown');
+    if (!dropdown.contains(event.target)) {
+        document.querySelector('.map-type-dropdown .dropdown-content').style.display = 'none';
+    }
+});
+
     // Complete municipality and barangay data with coordinates and boundaries
     const municipalities = {
     naval: {
@@ -91087,14 +91312,14 @@ function loadHeatmapData(hazardType) {
 const MapControls = {
     // Custom pointer marker
     customPointer: null,
-    
+
     // Create a custom pointer marker
     createCustomPointer(latlng, title) {
         // Remove existing pointer if any
         if (this.customPointer) {
             map.removeLayer(this.customPointer);
         }
-        
+
         // Create a new custom pointer
         this.customPointer = L.marker(latlng, {
             icon: L.divIcon({
@@ -91103,13 +91328,13 @@ const MapControls = {
                 iconSize: [20, 20]
             })
         }).addTo(map);
-        
+
         // Add popup if title is provided
         if (title) {
             this.customPointer.bindPopup(`<b>${title}</b>`).openPopup();
         }
     },
-    
+
     // Draw municipality boundary
     drawMunicipalityBoundary(municipality) {
         boundariesLayer.clearLayers();
@@ -91122,15 +91347,15 @@ const MapControls = {
             }).addTo(boundariesLayer);
         }
     },
-    
+
     // Update hazard markers
     updateHazardMarkers(hazardType) {
         currentMarkers.clearLayers();
-        
+
         if (hazardType && hazardData[hazardType]) {
             hazardData[hazardType].forEach(hazard => {
-                L.marker(hazard.coords, { 
-                    icon: hazardIcons[hazardType] 
+                L.marker(hazard.coords, {
+                    icon: hazardIcons[hazardType]
                 })
                 .bindPopup(`
                     <b>${hazard.name}</b><br>
@@ -91142,21 +91367,24 @@ const MapControls = {
             });
         }
     },
-    
+
     // Reset map to default state
     resetMap() {
         $('#municipalitySelect').val('').trigger('change');
+        $('#barangaySelect').val('');
         $('#hazardSelect').val('');
         updateLegend(null);
         map.setView([11.5833, 124.4642], 10);
 
-        
         // Clear all layers
-        if (heatmapLayer) map.removeLayer(heatmapLayer);
-        if (customPointer) map.removeLayer(customPointer);
-        
+        clearHeatmapLayers();
+        if (this.customPointer) {
+            map.removeLayer(this.customPointer);
+            this.customPointer = null;
+        }
+        boundariesLayer.clearLayers();
     },
-    
+
     // Change base map layer
     changeBaseLayer(layer) {
         map.eachLayer(l => {
@@ -91174,22 +91402,27 @@ const EventHandlers = {
     onMunicipalityChange() {
         const selectedMun = $(this).val();
         const barangaySelect = $('#barangaySelect');
-        
+
         barangaySelect.empty().append('<option value="">Select Barangay</option>');
-        
+
         if (selectedMun && municipalities[selectedMun]) {
             barangaySelect.prop('disabled', false);
             municipalities[selectedMun].barangays.forEach(barangay => {
                 barangaySelect.append(`<option value="${barangay.name.toLowerCase()}">${barangay.name}</option>`);
             });
-            
+
             // Center map and add pointer
             const munCoords = municipalities[selectedMun].coords;
             map.setView(munCoords, 12);
             MapControls.createCustomPointer(munCoords, $(this).find('option:selected').text());
-            
+
             // Draw municipality boundary
             MapControls.drawMunicipalityBoundary(selectedMun);
+
+            // Clear any existing heatmap when only municipality is selected
+            clearHeatmapLayers();
+            updateLegend(null);
+
         } else {
             barangaySelect.prop('disabled', true);
             if (MapControls.customPointer) {
@@ -91197,22 +91430,24 @@ const EventHandlers = {
                 MapControls.customPointer = null;
             }
             boundariesLayer.clearLayers();
+            clearHeatmapLayers();
+            updateLegend(null);
         }
     },
-    
+
     // Barangay select change
     onBarangayChange() {
         const selectedMun = $('#municipalitySelect').val();
         const selectedBrgy = $(this).val();
-        
+
         boundariesLayer.clearLayers();
-        
+
         if (selectedMun && selectedBrgy) {
             const barangay = municipalities[selectedMun].barangays.find(b => b.name.toLowerCase() === selectedBrgy);
             if (barangay) {
                 map.setView(barangay.coords, 14);
                 MapControls.createCustomPointer(barangay.coords, $(this).find('option:selected').text());
-                
+
                 // Draw barangay boundary
                 if (barangay.boundary) {
                     L.polygon(barangay.boundary, {
@@ -91223,22 +91458,48 @@ const EventHandlers = {
                     }).addTo(boundariesLayer);
                 }
             }
-        } else if (selectedMun) {
-            // If barangay is deselected, show municipality boundary
-            const munCoords = municipalities[selectedMun].coords;
-            map.setView(munCoords, 12);
-            MapControls.createCustomPointer(munCoords, $('#municipalitySelect').find('option:selected').text());
-            MapControls.drawMunicipalityBoundary(selectedMun);
+
+            // Load heatmap for barangay if hazard is selected
+            const selectedHazard = $('#hazardSelect').val();
+            if (selectedHazard) {
+                loadHeatmapData(selectedHazard, selectedMun, selectedBrgy);
+            } else {
+                showNotification('Please select a hazard type to view data.', 'info');
+            }
+        } else {
+            // If barangay is deselected, clear heatmap
+            clearHeatmapLayers();
+            updateLegend(null);
+            
+            // Show municipality boundary if municipality is selected
+            if (selectedMun) {
+                const munCoords = municipalities[selectedMun].coords;
+                map.setView(munCoords, 12);
+                MapControls.createCustomPointer(munCoords, $('#municipalitySelect').find('option:selected').text());
+                MapControls.drawMunicipalityBoundary(selectedMun);
+            }
         }
     },
-    
+
     // Hazard select change
     onHazardChange() {
         const selectedHazard = $(this).val();
+        const selectedMun = $('#municipalitySelect').val();
+        const selectedBrgy = $('#barangaySelect').val();
+
         updateLegend(selectedHazard);
-        loadHeatmapData(selectedHazard);
+        
+        // Only load heatmap if barangay is selected
+        if (selectedMun && selectedBrgy) {
+            loadHeatmapData(selectedHazard, selectedMun, selectedBrgy);
+        } else if (selectedHazard) {
+            showNotification('Please select a barangay to view hazard data.', 'info');
+            clearHeatmapLayers();
+        } else {
+            clearHeatmapLayers();
+        }
     },
-    
+
     // Toggle boundaries
     onToggleBoundaries() {
         if (map.hasLayer(boundariesLayer)) {
@@ -91254,21 +91515,24 @@ const EventHandlers = {
             }
         }
     },
-    
+
     // Submit form
     onSubmit() {
         const municipality = $('#municipalitySelect').val();
         const barangay = $('#barangaySelect').val();
         const hazard = $('#hazardSelect').val();
-        
-        if (!municipality && !hazard) {
-            alert('Please select at least a municipality or hazard type');
+
+        if (!municipality || !barangay || !hazard) {
+            showNotification('Please select a municipality, barangay, and hazard type.', 'warning');
             return;
         }
-        
+
         // In a real app, this would submit to a server
         console.log('Submitted:', { municipality, barangay, hazard });
-        alert('Selection submitted (check console for details)');
+        showNotification('Selection submitted (check console for details)', 'success');
+        
+        // Load the heatmap data
+        loadHeatmapData(hazard, municipality, barangay);
     }
 };
 
@@ -91278,19 +91542,19 @@ function initializeEventListeners() {
     $('#municipalitySelect').change(EventHandlers.onMunicipalityChange);
     $('#barangaySelect').change(EventHandlers.onBarangayChange);
     $('#hazardSelect').change(EventHandlers.onHazardChange);
-    
+
     // Map type buttons
     $('#darkBtn').click(() => MapControls.changeBaseLayer(darkMap));
     $('#lightBtn').click(() => MapControls.changeBaseLayer(lightMap));
     $('#streetBtn').click(() => MapControls.changeBaseLayer(streetMap));
     $('#satelliteBtn').click(() => MapControls.changeBaseLayer(satelliteMap));
     $('#terrainBtn').click(() => MapControls.changeBaseLayer(terrainMap));
-    
+
     // Action buttons
     $('#toggleBoundariesBtn').click(EventHandlers.onToggleBoundaries);
     $('#resetBtn').click(MapControls.resetMap);
     $('#submitBtn').click(EventHandlers.onSubmit);
-    
+
     // Window resize
     $(window).resize(() => map.invalidateSize());
 }
@@ -91341,14 +91605,13 @@ $(document).ready(function() {
         return String(str).replace(/[&<>"']/g, function (s) {
             return ({
                 '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
+                '<': '<',
+                '>': '>',
+                '"': '"',
                 "'": '&#39;'
             })[s];
         });
     }
-
         </script>
     </body>
 </html>

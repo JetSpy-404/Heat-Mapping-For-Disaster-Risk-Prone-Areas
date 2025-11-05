@@ -1,0 +1,190 @@
+        .leaflet-container {
+            z-index: 1 !important;
+        }
+
+        .leaflet-pane {
+            z-index: 1 !important;
+        }
+
+        .leaflet-top, .leaflet-bottom {
+            z-index: 2 !important;
+        }
+
+        /* Your main content should have higher z-index */
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .panel {
+            position: relative;
+            z-index: 10;
+        }
+        .map-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            overflow: hidden;
+            height: 650px
+        }
+        .map-controls-panel {
+            width: 280px;
+            min-width: 280px;
+            background-color: #00d9b9;
+            padding: 20px;
+            border-radius: 5px;
+            height: 650px;
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            font-weight: 600;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8eff5;
+            margin-bottom: 20px;
+        }
+
+        .map-container {
+            flex: 1;
+            min-width: 0;
+            height: 730px;
+            border-radius: 5px;
+            position: relative;
+            
+        }
+        #biliranMap {
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+        }
+        .map-type-dropdown {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            z-index: 1000;
+        }
+
+        .map-type-dropdown .dropdown-toggle {
+            padding: 5px 10px;
+        }
+
+        .map-type-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            padding: 5px;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .map-type-dropdown:hover .dropdown-content {
+            display: flex;
+        }
+
+        /* Make sure buttons in dropdown take full width */
+        .map-type-dropdown .dropdown-content button {
+            width: 100%;
+            text-align: left;
+        }
+         /* Updated legend styles */
+        .legend {
+            position: absolute;
+            bottom: 90px;
+            left: 20px;
+            z-index: 1000;
+            background-color: rgba(42, 48, 56, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            max-width: 200px;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+            border-radius: 3px;
+        }
+        .legend-title {
+            margin-bottom: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+        }
+        .legend-item {
+            margin-bottom: 3px;
+        }
+        .form-select, .form-control {
+            border: 1px solid #495057;
+        }
+        .form-select:focus, .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Custom pointer marker */
+        .custom-pointer {
+            background-color: #00ff00;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+
+        .btn1 {
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .btn-warning {
+            background: linear-gradient(to right, #ff9a3d, #ff7b00);
+            border: none;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: linear-gradient(to right, #ff7b00, #ff6600);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 123, 0, 0.3);
+        }
+        .btn-success {
+            background: linear-gradient(to right, #3d95ff, #007bff);
+            border: none;
+            color: white;
+            margin-top: 4px;
+        }
+        .btn-success:hover {
+            background: linear-gradient(to right, #007bff, #0066cc);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .map-wrapper {
+                flex-direction: column;
+                height: 800px;
+            }
+            .map-controls-panel {
+                width: 100%;
+                height: auto;
+                max-height: 400px;
+            }
+            .map-container {
+                height: auto;
+            }
+            .legend {
+                bottom: 20px;
+            }
+        }
