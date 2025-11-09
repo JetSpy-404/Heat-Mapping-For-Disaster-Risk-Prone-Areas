@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAGASA Advisories Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                    PAGASA Tropical Cyclone Advisories
+                    <span class="status-indicator ml-3 w-3 h-3 bg-green-500 rounded-full" id="status-indicator"></span>
+                </h1>
+                <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 refresh-btn" onclick="refreshPDFs()">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Refresh Advisories
+                </button>
+            </div>
+            <p class="text-gray-600 text-lg">Real-time display of the latest PDF advisories downloaded by the PAGASA monitor.</p>
+            <p class="text-sm text-gray-500" id="last-updated">Last updated: Never</p>
+            <div class="loading hidden text-center py-4 text-gray-500 font-medium" id="loading">
+                <svg class="animate-spin w-6 h-6 inline mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading advisories...
+            </div>
+        </div>
+
+        <!-- Advisories List -->
+        <div id="advisories-list" class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Latest Advisories</h2>
+            <ul id="advisories-ul" class="space-y-4">
+                <!-- Advisories will be loaded here dynamically -->
+            </ul>
+        </div>
+
+        <!-- Latest PDF Display -->
+        <div id="latest-pdf-display" class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Latest Advisory PDF</h2>
+            <iframe id="latest-pdf-iframe" class="w-full h-96 border border-gray-200 rounded-lg" type="application/pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div id="pdf-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-screen overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+                    <h2 id="modal-title" class="text-xl font-bold text-white">PDF Viewer</h2>
+                    <button onclick="closePDFModal()" class="text-white hover:text-gray-200 transition duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <iframe id="modal-pdf-iframe" class="w-full h-[80vh] border border-gray-200 rounded-lg" type="application/pdf"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastUpdate = null;
+
+        // Load PDFs on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPDFs();
+            // Auto-refresh every 5 minutes
+            setInterval(loadPDFs, 5 * 60 * 1000);
+
+            // Start PAGASA monitor
+            startPagasaMonitor();
+        });
+
+        async function loadPDFs() {
+            const loading = document.getElementById('loading');
+            const statusIndicator = document.getElementById('status-indicator');
+            const container = document.getElementById('advisories-ul');
+
+            loading.style.display = 'block';
+            statusIndicator.classList.add('updating');
+
+            try {
+                const response = await fetch('list_pdfs.php');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const pdfs = await response.json();
+                console.log('Loaded PDFs:', pdfs);
+
+                if (pdfs.error) {
+                    throw new Error(pdfs.error);
+                }
+
+                // Always display PDFs for now (remove update check to force refresh)
+                displayAdvisories(pdfs);
+                displayLatestPDF(pdfs);
+                lastUpdate = pdfs.length > 0 ? pdfs[0].modified : null;
+
+                // Update last updated time
+                updateLastUpdatedTime();
+
+            } catch (error) {
+                console.error('Error loading PDFs:', error);
+                container.innerHTML = `<li class="text-red-500">Error loading advisories: ${error.message}. Please check if PHP is running and try again.</li>`;
+            } finally {
+                loading.style.display = 'none';
+                statusIndicator.classList.remove('updating');
+            }
+        }
+
+        function displayAdvisories(pdfs) {
+            const container = document.getElementById('advisories-ul');
+
+            if (pdfs.length === 0) {
+                container.innerHTML = `
+                    <li class="text-gray-500 text-center py-8">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">No PDF Advisories Found</h3>
+                        <p class="text-gray-500">The monitor may still be downloading files. Please check back later.</p>
+                    </li>
+                `;
+                return;
+            }
+
+            // Display only the latest and last hours advisory (first two in sorted list)
+            const latestAdvisories = pdfs.slice(0, 2);
+
+            let html = '';
+            latestAdvisories.forEach(pdf => {
+                const fileSizeMB = (pdf.size / (1024 * 1024)).toFixed(2);
+                html += `
+                    <li class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                    ${formatPDFTitle(pdf.filename)}
+                                </h3>
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Updated: ${pdf.modified}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-9 0V1m10 3V1m0 3l1 1v16a2 2 0 01-2 2H6a2 2 0 01-2-2V5l1-1z"></path>
+                                        </svg>
+                                        Size: ${fileSizeMB} MB
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2 ml-4">
+                                <button onclick="viewFullPDF('${pdf.path}', '${formatPDFTitle(pdf.filename)}')" class="bg-blue-500 text-white hover:bg-blue-600 font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    View
+                                </button>
+                                <a href="${pdf.path}" target="_blank" class="bg-green-500 text-white hover:bg-green-600 font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function formatPDFTitle(filename) {
+            // Convert filename to readable title
+            return filename
+                .replace('.pdf', '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function viewFullPDF(pdfPath, title) {
+            const modal = document.getElementById('pdf-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalIframe = document.getElementById('modal-pdf-iframe');
+
+            modalTitle.textContent = title;
+            modalIframe.src = pdfPath;
+            modal.classList.remove('hidden');
+
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function displayLatestPDF(pdfs) {
+            const iframe = document.getElementById('latest-pdf-iframe');
+            if (pdfs.length > 0) {
+                iframe.src = pdfs[0].path;
+            } else {
+                iframe.src = '';
+            }
+        }
+
+        function closePDFModal() {
+            const modal = document.getElementById('pdf-modal');
+            const modalIframe = document.getElementById('modal-pdf-iframe');
+
+            modal.classList.add('hidden');
+            modalIframe.src = '';
+
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateLastUpdatedTime() {
+            const lastUpdatedElement = document.getElementById('last-updated');
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            lastUpdatedElement.textContent = `Last updated: ${timeString}`;
+        }
+
+        // PAGASA Monitor Integration - Check for updates via PHP
+        function startPagasaMonitor() {
+            console.log('Starting PAGASA Monitor check...');
+
+            // Check for new advisories immediately on load
+            checkForNewAdvisories();
+
+            // Check every 5 minutes (300000 ms)
+            setInterval(checkForNewAdvisories, 5 * 60 * 1000);
+        }
+
+        async function checkForNewAdvisories() {
+            try {
+                console.log('Checking for new PAGASA advisories...');
+
+                // Call PHP endpoint to check and download new advisories
+                const response = await fetch('check_advisories.php');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('Advisory check result:', result);
+
+                if (result.new_advisories && result.new_advisories.length > 0) {
+                    console.log(`Found ${result.new_advisories.length} new advisories!`);
+
+                    // Show notification
+                    showNotification(`Downloaded ${result.new_advisories.length} new advisory(ies)!`, 'success');
+
+                    // Refresh the display
+                    loadPDFs();
+                } else {
+                    console.log('No new advisories found');
+                }
+
+            } catch (error) {
+                console.error('Error checking for new advisories:', error);
+                showNotification('Failed to check for new advisories', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+
+        function refreshPDFs() {
+            loadPDFs();
+        }
+
+        // Manual refresh function exposed globally
+        window.refreshPDFs = refreshPDFs;
+
+        // Close modal when clicking outside
+        document.getElementById('pdf-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePDFModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePDFModal();
+            }
+        });
+    </script>
+</body>
+</html>

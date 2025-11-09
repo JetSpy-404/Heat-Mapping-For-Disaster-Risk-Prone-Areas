@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAGASA Advisories Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .pdf-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pdf-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pdf-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .download-link:hover {
+            background-color: #0056b3;
+        }
+        .refresh-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .refresh-btn:hover {
+            background-color: #218838;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .no-pdfs {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #28a745;
+            margin-left: 10px;
+        }
+        .status-indicator.updating {
+            background-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PAGASA Tropical Cyclone Advisories <span class="status-indicator" id="status-indicator"></span></h1>
+        <p>Real-time display of the latest PDF advisories downloaded by the PAGASA monitor.</p>
+        <button class="refresh-btn" onclick="refreshPDFs()">Refresh Advisories</button>
+        <div class="loading" id="loading">Loading advisories...</div>
+    </div>
+
+    <div id="pdfs-container">
+        <!-- PDFs will be loaded here dynamically -->
+    </div>
+
+    <script>
+        let lastUpdate = null;
+
+        // Load PDFs on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPDFs();
+            // Auto-refresh every 5 minutes
+            setInterval(loadPDFs, 5 * 60 * 1000);
+        });
+
+        async function loadPDFs() {
+            const loading = document.getElementById('loading');
+            const statusIndicator = document.getElementById('status-indicator');
+            const container = document.getElementById('pdfs-container');
+
+            loading.style.display = 'block';
+            statusIndicator.classList.add('updating');
+
+            try {
+                const response = await fetch('list_pdfs.php');
+                const pdfs = await response.json();
+
+                if (pdfs.error) {
+                    throw new Error(pdfs.error);
+                }
+
+                // Check if there are updates
+                const latestModified = pdfs.length > 0 ? pdfs[0].modified : null;
+                if (lastUpdate !== latestModified) {
+                    displayPDFs(pdfs);
+                    lastUpdate = latestModified;
+                }
+
+            } catch (error) {
+                console.error('Error loading PDFs:', error);
+                container.innerHTML = '<div class="no-pdfs">Error loading advisories. Please try again later.</div>';
+            } finally {
+                loading.style.display = 'none';
+                statusIndicator.classList.remove('updating');
+            }
+        }
+
+        function displayPDFs(pdfs) {
+            const container = document.getElementById('pdfs-container');
+
+            if (pdfs.length === 0) {
+                container.innerHTML = '<div class="no-pdfs">No PDF advisories found. The monitor may still be downloading files.</div>';
+                return;
+            }
+
+            let html = '';
+            pdfs.forEach(pdf => {
+                const fileSizeMB = (pdf.size / (1024 * 1024)).toFixed(2);
+                html += `
+                    <div class="pdf-container">
+                        <div class="pdf-title">
+                            ${formatPDFTitle(pdf.filename)}
+                            <span class="pdf-meta">Updated: ${pdf.modified} | Size: ${fileSizeMB} MB</span>
+                        </div>
+                        <iframe src="${pdf.path}" type="application/pdf"></iframe>
+                        <a href="${pdf.path}" class="download-link" target="_blank">Download PDF</a>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function formatPDFTitle(filename) {
+            // Convert filename to readable title
+            return filename
+                .replace('.pdf', '')

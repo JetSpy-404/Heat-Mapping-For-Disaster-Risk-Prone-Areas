@@ -1,0 +1,21 @@
+{
+  "knownAdvisories": [
+    "https://www.pagasa.dost.gov.ph/weather/weather-advisory",
+    "https://www.pagasa.dost.gov.ph/tropical-cyclone-advisory-iframe",
+    "https://www.pagasa.dost.gov.ph/tropical-cyclone/tropical-cyclone-advisory",
+    "https://www.pagasa.dost.gov.ph/tropical-cyclone/severe-weather-bulletin",
+    "https://www.pagasa.dost.gov.ph/tropical-cyclone-bulletin-iframe",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%235_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%236_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%237_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%238_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%239_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%2310_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%2311_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%2313_uwan.pdf",
+    "https://pubfiles.pagasa.dost.gov.ph/tamss/weather/bulletin/TCB%2312_uwan.pdf"
+  ],
+  "lastUpdated": "2025-11-09T13:04:12.094Z",
+  "totalAdvisories": 19,
+  "monitorVersion": "2.0.0"
+}
