@@ -60,21 +60,8 @@ try {
     $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
     $_SESSION['user_role'] = $user['role'];
 
-    // Set login success greeting with time-based greeting
-    $current_hour = date('H');
-    $time_greeting = '';
-
-    if ($current_hour >= 5 && $current_hour < 12) {
-        $time_greeting = 'Good morning';
-    } elseif ($current_hour >= 12 && $current_hour < 17) {
-        $time_greeting = 'Good afternoon';
-    } elseif ($current_hour >= 17 && $current_hour < 21) {
-        $time_greeting = 'Good evening';
-    } else {
-        $time_greeting = 'Good night';
-    }
-
-    $_SESSION['login_greeting'] = $time_greeting . ", " . $user['first_name'] . "!";
+    // Set login success greeting
+    $_SESSION['login_greeting'] = "Welcome back, " . $user['first_name'] . "!";
 
     // redirect to PHP-protected dashboard wrapper
     header('Location: dashboard.php');

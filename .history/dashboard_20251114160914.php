@@ -2,9 +2,6 @@
 include_once __DIR__ . '/session_check.php';
 include_once __DIR__ . '/access_control.php';
 
-// Set timezone to ensure correct time
-date_default_timezone_set('Asia/Manila');
-
 // All users can access dashboard (read-only for users)
 $content = file_get_contents(__DIR__ . '/dashboard.html');
 
@@ -29,7 +26,7 @@ if (isset($_SESSION['user_id'])) {
 
     // Inject greeting into the dashboard content
     $greeting_html = '<div id="login-greeting" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-        <img src="assets/greetings.gif" alt="Greeting" class="me-2" style="width: 120px; height: 120px; border-radius: 50%;">
+        <i class="fas fa-check-circle me-2"></i>
         <strong>' . htmlspecialchars($greeting) . '</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
