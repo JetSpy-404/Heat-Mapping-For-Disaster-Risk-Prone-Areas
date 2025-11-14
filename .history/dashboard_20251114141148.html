@@ -1,0 +1,2224 @@
+<?php include_once __DIR__ . '/session_check.php'; ?>
+<?php include_once __DIR__ . '/access_control.php'; ?>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="favicon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/perfect-scrollbar.min.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/dashboard.css">
+        <link defer="" rel="stylesheet" type="text/css" media="screen" href="assets/css/animate.css">
+        <script src="assets/js/perfect-scrollbar.min.js"></script>
+        <script defer="" src="assets/js/popper.min.js"></script>
+        <script defer="" src="assets/js/tippy-bundle.umd.min.js"></script>
+        <script defer="" src="assets/js/sweetalert.min.js"></script>
+    </head>
+
+    <body x-data="main" class="relative overflow-x-hidden font-nunito text-sm font-normal antialiased" :class="[ $store.app.sidebar ? 'toggle-sidebar' : '', $store.app.theme === 'dark' || $store.app.isDarkMode ?  'dark' : '', $store.app.menu, $store.app.layout,$store.app.rtlClass]">
+        <!-- sidebar menu overlay -->
+        <div x-cloak="" class="fixed inset-0 z-50 bg-[black]/60 lg:hidden" :class="{'hidden' : !$store.app.sidebar}" @click="$store.app.toggleSidebar()"></div>
+
+        <!-- screen loader -->
+        <div class="screen_loader animate__animated fixed inset-0 z-[60] grid place-content-center bg-[#fafafa] dark:bg-[#060818]">
+            <svg width="64" height="64" viewbox="0 0 135 135" xmlns="http://www.w3.org/2000/svg" fill="#4361ee">
+                <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+                    <animatetransform attributename="transform" type="rotate" from="0 67 67" to="-360 67 67" dur="2.5s" repeatcount="indefinite"></animatetransform>
+                </path>
+                <path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+                    <animatetransform attributename="transform" type="rotate" from="0 67 67" to="360 67 67" dur="8s" repeatcount="indefinite"></animatetransform>
+                </path>
+            </svg>
+        </div>
+
+
+        <div class="main-container min-h-screen text-black dark:text-white-dark" :class="[$store.app.navbar]">
+            <!-- start sidebar section -->
+            <div :class="{'dark text-white-dark' : $store.app.semidark}">
+                <nav x-data="sidebar" class="sidebar fixed top-0 bottom-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300">
+                    <div class="h-full bg-white dark:bg-[#0e1726]">
+                        <div class="flex items-center justify-between px-4 py-3">
+                            <a href="dashboard.php" class="main-logo flex shrink-0 items-center">
+                                <img class="ml-[5px] w-8 flex-none" src="assets/images/logo10.png" alt="image">
+                                <span id="sidebar-role" class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">Administrator</span>
+                            </a>
+                            <a href="javascript:;" class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 rtl:rotate-180 dark:text-white-light dark:hover:bg-dark-light/10" @click="$store.app.toggleSidebar()">
+                                <svg class="m-auto h-5 w-5" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 19L7 12L13 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path opacity="0.5" d="M16.9998 19L10.9998 12L16.9998 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        <ul class="perfect-scrollbar relative h-[calc(100vh-80px)] space-y-0.5 overflow-y-auto overflow-x-hidden p-4 py-0 font-semibold" x-data="{ activeDropdown: null }">
+                            <li class="menu nav-item">
+                            </li>
+
+                            <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 py-3 px-7 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                                <svg class="hidden h-5 w-4 flex-none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Dashboard</span>
+                            </h2>
+
+                            <li class="nav-item">
+                                <ul>
+                                    <li class="nav-item">
+                                        <a href="#" class="active group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M13 15.4C13 13.3258 13 12.2887 13.659 11.6444C14.318 11 15.3787 11 17.5 11C19.6213 11 20.682 11 21.341 11.6444C22 12.2887 22 13.3258 22 15.4V17.6C22 19.6742 22 20.7113 21.341 21.3556C20.682 22 19.6213 22 17.5 22C15.3787 22 14.318 22 13.659 21.3556C13 20.7113 13 19.6742 13 17.6V15.4Z" fill="currentColor"></path>
+                                                    <path d="M2 8.6C2 10.6742 2 11.7113 2.65901 12.3556C3.31802 13 4.37868 13 6.5 13C8.62132 13 9.68198 13 10.341 12.3556C11 11.7113 11 10.6742 11 8.6V6.4C11 4.32582 11 3.28873 10.341 2.64437C9.68198 2 8.62132 2 6.5 2C4.37868 2 3.31802 2 2.65901 2.64437C2 3.28873 2 4.32582 2 6.4V8.6Z" fill="currentColor"></path>
+                                                    <path d="M13 5.5C13 4.4128 13 3.8692 13.1713 3.44041C13.3996 2.86867 13.8376 2.41443 14.389 2.17761C14.8024 2 15.3266 2 16.375 2H18.625C19.6734 2 20.1976 2 20.611 2.17761C21.1624 2.41443 21.6004 2.86867 21.8287 3.44041C22 3.8692 22 4.4128 22 5.5C22 6.5872 22 7.1308 21.8287 7.55959C21.6004 8.13133 21.1624 8.58557 20.611 8.82239C20.1976 9 19.6734 9 18.625 9H16.375C15.3266 9 14.8024 9 14.389 8.82239C13.8376 8.58557 13.3996 8.13133 13.1713 7.55959C13 7.1308 13 6.5872 13 5.5Z" fill="currentColor"></path>
+                                                    <path opacity="0.5" d="M2 18.5C2 19.5872 2 20.1308 2.17127 20.5596C2.39963 21.1313 2.83765 21.5856 3.38896 21.8224C3.80245 22 4.32663 22 5.375 22H7.625C8.67337 22 9.19755 22 9.61104 21.8224C10.1624 21.5856 10.6004 21.1313 10.8287 20.5596C11 20.1308 11 19.5872 11 18.5C11 17.4128 11 16.8692 10.8287 16.4404C10.6004 15.8687 10.1624 15.4144 9.61104 15.1776C9.19755 15 8.67337 15 7.625 15H5.375C4.32663 15 3.80245 15 3.38896 15.1776C2.83765 15.4144 2.39963 15.8687 2.17127 16.4404C2 16.8692 2 17.4128 2 18.5Z" fill="currentColor"></path>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Dashboard</span>
+                                            </div>
+                                        </a>
+                                    </li>
+
+                            <li class="nav-item">
+                                <ul>
+                                    <li class="nav-item">
+                                        <a href="statistics.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M6.22209 4.60105C6.66665 4.304 7.13344 4.04636 7.6171 3.82976C8.98898 3.21539 9.67491 2.9082 10.5875 3.4994C11.5 4.09061 11.5 5.06041 11.5 7.00001V8.50001C11.5 10.3856 11.5 11.3284 12.0858 11.9142C12.6716 12.5 13.6144 12.5 15.5 12.5H17C18.9396 12.5 19.9094 12.5 20.5006 13.4125C21.0918 14.3251 20.7846 15.011 20.1702 16.3829C19.9536 16.8666 19.696 17.3334 19.399 17.7779C18.3551 19.3402 16.8714 20.5578 15.1355 21.2769C13.3996 21.9959 11.4895 22.184 9.64665 21.8175C7.80383 21.4509 6.11109 20.5461 4.78249 19.2175C3.45389 17.8889 2.5491 16.1962 2.18254 14.3534C1.81598 12.5105 2.00412 10.6004 2.72315 8.86451C3.44218 7.12861 4.65982 5.64492 6.22209 4.60105Z" fill="currentColor"></path>
+                                                    <path d="M21.446 7.06901C20.6342 5.00831 18.9917 3.36579 16.931 2.55398C15.3895 1.94669 14 3.34316 14 5.00002V9.00002C14 9.5523 14.4477 10 15 10H19C20.6569 10 22.0533 8.61055 21.446 7.06901Z" fill="currentColor"></path>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Statistics</span>
+                                            </div>
+                                        </a>
+                                    </li>
+
+                            <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 py-3 px-7 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                                <svg class="hidden h-5 w-4 flex-none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Maps</span>
+                            </h2>
+
+                                    <li class="nav-item">
+                                        <a href="heatmap.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C16.714 2 19.0711 2 20.5355 3.46447C21.0394 3.96833 21.3699 4.57786 21.5867 5.3527L5.3527 21.5867C4.57786 21.3699 3.96833 21.0394 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2ZM5.5 8.75732C5.5 10.5422 6.61708 12.625 8.35997 13.3698C8.76626 13.5434 9.23374 13.5434 9.64003 13.3698C11.3829 12.625 12.5 10.5422 12.5 8.75732C12.5 6.95835 10.933 5.5 9 5.5C7.067 5.5 5.5 6.95835 5.5 8.75732Z" fill="currentColor"/>
+                                                    <path d="M10.5 9C10.5 9.82843 9.82843 10.5 9 10.5C8.17157 10.5 7.5 9.82843 7.5 9C7.5 8.17157 8.17157 7.5 9 7.5C9.82843 7.5 10.5 8.17157 10.5 9Z" fill="currentColor"/>
+                                                    <g opacity="0.5">
+                                                    <path d="M21.8893 7.17188C22.0002 8.43338 22.0002 10.0059 22.0002 12.0002C22.0002 16.1339 22.0002 18.4552 21.0128 19.9515L15.0613 14L21.8893 7.17188Z" fill="currentColor"/>
+                                                    <path d="M19.9523 21.0123L14.0006 15.0607L7.17188 21.8893C8.43338 22.0002 10.0059 22.0002 12.0002 22.0002C16.1346 22.0002 18.4559 22.0002 19.9523 21.0123Z" fill="currentColor"/>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Heatmap</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" x-show="canAccessFeature('chloropleth')">
+                                        <a href="chloropleth.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g opacity="0.5">
+                                                        <path d="M3 8.70938V16.8377C3 17.8813 3 18.4031 3.28314 18.7959C3.56627 19.1888 4.06129 19.3538 5.05132 19.6838L6.21609 20.072C7.58318 20.5277 8.26674 20.7556 8.95493 20.6634C8.96999 20.6614 8.98501 20.6593 9 20.6569V6.65705C8.88712 6.67391 8.77331 6.68433 8.6591 6.68823C8.11989 6.70665 7.58626 6.52877 6.51901 6.17302C5.12109 5.70705 4.42213 5.47406 3.89029 5.71066C3.70147 5.79466 3.53204 5.91678 3.39264 6.06935C3 6.49907 3 7.23584 3 8.70938Z" fill="currentColor"/>
+                                                        <path d="M21 15.2907V7.16229C21 6.11872 21 5.59692 20.7169 5.20409C20.4337 4.81126 19.9387 4.64625 18.9487 4.31624L17.7839 3.92799C16.4168 3.47229 15.7333 3.24444 15.0451 3.3366C15.03 3.33861 15.015 3.34078 15 3.34309V17.343C15.1129 17.3261 15.2267 17.3157 15.3409 17.3118C15.8801 17.2934 16.4137 17.4713 17.481 17.827C18.8789 18.293 19.5779 18.526 20.1097 18.2894C20.2985 18.2054 20.468 18.0833 20.6074 17.9307C21 17.501 21 16.7642 21 15.2907Z" fill="currentColor"/>
+                                                        </g>
+                                                        <path d="M9.24685 6.60921C9.16522 6.6285 9.08286 6.64435 9 6.65673V20.6566C9.66964 20.5533 10.2689 20.1538 11.4416 19.3719L12.824 18.4503C13.7601 17.8263 14.2281 17.5143 14.7532 17.3902C14.8348 17.3709 14.9171 17.355 15 17.3427V3.34277C14.3304 3.44613 13.7311 3.84561 12.5583 4.62747L11.176 5.54905C10.2399 6.17308 9.77191 6.48509 9.24685 6.60921Z" fill="currentColor"/>
+                                                        <path d="M17.481 17.8267C17.5684 17.8558 17.653 17.884 17.735 17.9113L17.481 17.8267Z" fill="currentColor"/>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Chloropleth</span>
+                                            </div>
+                                        </a>
+                                    </li>
+
+                            <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 py-3 px-7 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                                <svg class="hidden h-5 w-4 flex-none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Data</span>
+                            </h2>
+
+                                    <li class="nav-item" x-show="canAccessFeature('hazard_types')">
+                                        <a href="hazard_types.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" fill="currentColor"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 12C7.25 11.5858 7.58579 11.25 8 11.25H16C16.4142 11.25 16.75 11.5858 16.75 12C16.75 12.4142 16.4142 12.75 16 12.75H8C7.58579 12.75 7.25 12.4142 7.25 12Z" fill="currentColor"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 8C7.25 7.58579 7.58579 7.25 8 7.25H16C16.4142 7.25 16.75 7.58579 16.75 8C16.75 8.41421 16.4142 8.75 16 8.75H8C7.58579 8.75 7.25 8.41421 7.25 8Z" fill="currentColor"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.25 16C7.25 15.5858 7.58579 15.25 8 15.25H13C13.4142 15.25 13.75 15.5858 13.75 16C13.75 16.4142 13.4142 16.75 13 16.75H8C7.58579 16.75 7.25 16.4142 7.25 16Z" fill="currentColor"></path>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Hazard Types</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="hazard_data.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M4.97883 9.68508C2.99294 8.89073 2 8.49355 2 8C2 7.50645 2.99294 7.10927 4.97883 6.31492L7.7873 5.19153C9.77318 4.39718 10.7661 4 12 4C13.2339 4 14.2268 4.39718 16.2127 5.19153L19.0212 6.31492C21.0071 7.10927 22 7.50645 22 8C22 8.49355 21.0071 8.89073 19.0212 9.68508L16.2127 10.8085C14.2268 11.6028 13.2339 12 12 12C10.7661 12 9.77318 11.6028 7.7873 10.8085L4.97883 9.68508Z" fill="currentColor"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 8C2 8.49355 2.99294 8.89073 4.97883 9.68508L7.7873 10.8085C9.77318 11.6028 10.7661 12 12 12C13.2339 12 14.2268 11.6028 16.2127 10.8085L19.0212 9.68508C21.0071 8.89073 22 8.49355 22 8C22 7.50645 21.0071 7.10927 19.0212 6.31492L16.2127 5.19153C14.2268 4.39718 13.2339 4 12 4C10.7661 4 9.77318 4.39718 7.7873 5.19153L4.97883 6.31492C2.99294 7.10927 2 7.50645 2 8Z" fill="currentColor"></path>
+                                                    <path opacity="0.7" d="M5.76613 10L4.97883 10.3149C2.99294 11.1093 2 11.5065 2 12C2 12.4935 2.99294 12.8907 4.97883 13.6851L7.7873 14.8085C9.77318 15.6028 10.7661 16 12 16C13.2339 16 14.2268 15.6028 16.2127 14.8085L19.0212 13.6851C21.0071 12.8907 22 12.4935 22 12C22 11.5065 21.0071 11.1093 19.0212 10.3149L18.2339 10L16.2127 10.8085C14.2268 11.6028 13.2339 12 12 12C10.7661 12 9.77318 11.6028 7.7873 10.8085L5.76613 10Z" fill="currentColor"></path>
+                                                    <path opacity="0.4" d="M5.76613 14L4.97883 14.3149C2.99294 15.1093 2 15.5065 2 16C2 16.4935 2.99294 16.8907 4.97883 17.6851L7.7873 18.8085C9.77318 19.6028 10.7661 20 12 20C13.2339 20 14.2268 19.6028 16.2127 18.8085L19.0212 17.6851C21.0071 16.8907 22 16.4935 22 16C22 15.5065 21.0071 15.1093 19.0212 14.3149L18.2339 14L16.2127 14.8085C14.2268 15.6028 13.2339 16 12 16C10.7661 16 9.77318 15.6028 7.7873 14.8085L5.76613 14Z" fill="currentColor"></path>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Hazard Data</span>
+                                            </div>
+                                        </a>
+                                    </li>
+
+                            <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 py-3 px-7 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                                <svg class="hidden h-5 w-4 flex-none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Locations</span>
+                            </h2>
+
+                                    <li class="nav-item">
+                                        <a href="barangay.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M19.7165 20.3624C21.143 19.5846 22 18.5873 22 17.5C22 16.3475 21.0372 15.2961 19.4537 14.5C17.6226 13.5794 14.9617 13 12 13C9.03833 13 6.37738 13.5794 4.54631 14.5C2.96285 15.2961 2 16.3475 2 17.5C2 18.6525 2.96285 19.7039 4.54631 20.5C6.37738 21.4206 9.03833 22 12 22C15.1066 22 17.8823 21.3625 19.7165 20.3624Z" fill="currentColor"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M5 8.51464C5 4.9167 8.13401 2 12 2C15.866 2 19 4.9167 19 8.51464C19 12.0844 16.7658 16.2499 13.2801 17.7396C12.4675 18.0868 11.5325 18.0868 10.7199 17.7396C7.23416 16.2499 5 12.0844 5 8.51464ZM12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11Z" fill="currentColor"></path>
+                                                </svg>
+
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Barangay</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" x-show="canAccessFeature('municipality')">
+                                        <a href="municipality.php" class="group">
+                                            <div class="flex items-center">
+                                                <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.75 2H12.75C14.6356 2 15.5784 2 16.1642 2.58579C16.75 3.17157 16.75 4.11438 16.75 6V21.25H21.25H21.75C22.1642 21.25 22.5 21.5858 22.5 22C22.5 22.4142 22.1642 22.75 21.75 22.75H1.75C1.33579 22.75 1 22.4142 1 22C1 21.5858 1.33579 21.25 1.75 21.25H5.25H6.75V6C6.75 4.11438 6.75 3.17157 7.33579 2.58579C7.92157 2 8.86438 2 10.75 2ZM9 12C9 11.5858 9.33579 11.25 9.75 11.25H13.75C14.1642 11.25 14.5 11.5858 14.5 12C14.5 12.4142 14.1642 12.75 13.75 12.75H9.75C9.33579 12.75 9 12.4142 9 12ZM9 15C9 14.5858 9.33579 14.25 9.75 14.25H13.75C14.1642 14.25 14.5 14.5858 14.5 15C14.5 15.4142 14.1642 15.75 13.75 15.75H9.75C9.33579 15.75 9 15.4142 9 15ZM11.75 18.25C12.1642 18.25 12.5 18.5858 12.5 19V21.25H11V19C11 18.5858 11.3358 18.25 11.75 18.25ZM9.25 7C9.25 5.48122 10.4812 4.25 12 4.25C13.5188 4.25 14.75 5.48122 14.75 7C14.75 8.51878 13.5188 9.75 12 9.75C10.4812 9.75 9.25 8.51878 9.25 7Z" fill="currentColor"/>
+                                                    <path opacity="0.5" d="M10.75 7C10.75 6.30964 11.3096 5.75 12 5.75C12.6904 5.75 13.25 6.30964 13.25 7C13.25 7.69036 12.6904 8.25 12 8.25C11.3096 8.25 10.75 7.69036 10.75 7Z" fill="currentColor"/>
+                                                    <path opacity="0.5" d="M20.9129 5.88881C21.25 6.39325 21.25 7.09549 21.25 8.49995V21.2499H21.75C22.1642 21.2499 22.5 21.5857 22.5 21.9999C22.5 22.4142 22.1642 22.7499 21.75 22.7499H1.75C1.33579 22.7499 1 22.4142 1 21.9999C1 21.5857 1.33579 21.2499 1.75 21.2499H2.25V8.49995C2.25 7.09549 2.25 6.39325 2.58706 5.88881C2.73298 5.67043 2.92048 5.48293 3.13886 5.33701C3.58008 5.04219 5.67561 5.00524 6.75702 5.00061C6.75291 5.292 6.75294 5.59649 6.75298 5.91045L6.75299 5.99995V7.24995H4.25C3.83579 7.24995 3.5 7.58573 3.5 7.99995C3.5 8.41416 3.83579 8.74995 4.25 8.74995H6.75299V10.2499H4.25C3.83579 10.2499 3.5 10.5857 3.5 10.9999C3.5 11.4142 3.83579 11.7499 4.25 11.7499H6.75299V13.2499H4.25C3.83579 13.2499 3.5 13.5857 3.5 13.9999C3.5 14.4142 3.83579 14.7499 4.25 14.7499H6.75299V21.2499H16.7529V14.7499H19.25C19.6642 14.7499 20 14.4142 20 13.9999C20 13.5857 19.6642 13.2499 19.25 13.2499H16.7529V11.7499H19.25C19.6642 11.7499 20 11.4142 20 10.9999C20 10.5857 19.6642 10.2499 19.25 10.2499H16.7529V8.74995H19.25C19.6642 8.74995 20 8.41416 20 7.99995C20 7.58573 19.6642 7.24995 19.25 7.24995H16.7529V5.99995L16.7529 5.91046V5.91043C16.753 5.59648 16.753 5.292 16.7489 5.00061C17.8303 5.00524 19.9199 5.04219 20.3611 5.33701C20.5795 5.48293 20.767 5.67043 20.9129 5.88881Z" fill="currentColor"/>
+                                                </svg>
+                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Municipalities</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+
+                        <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 py-3 px-7 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
+                                <svg class="hidden h-5 w-4 flex-none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Users</span>
+                            </h2>
+
+                        
+                            <li class="menu nav-item" x-show="canAccessFeature('municipality_users')">
+                                <a href="municipality_users.php" class="nav-link group">
+                                    <div class="flex items-center">
+                                        <svg class="shrink-0 group-hover:!text-primary" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor"></circle>
+                                            <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3" fill="currentColor"></ellipse>
+                                            <circle cx="9.00098" cy="6" r="4" fill="currentColor"></circle>
+                                            <ellipse cx="9.00098" cy="17.001" rx="7" ry="4" fill="currentColor"></ellipse>
+                                        </svg>
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">Municipality Users</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <!-- end sidebar section -->
+
+            <div class="main-content flex flex-col min-h-screen">
+                <!-- start header section -->
+                <header class="z-40" :class="{'dark' : $store.app.semidark && $store.app.menu === 'horizontal'}">
+                    <div class="shadow-sm">
+                        <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
+                            <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
+                                <a href="index.html" class="main-logo flex shrink-0 items-center">
+                                    <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="assets/images/logo10.png" alt="image">
+                                    <span id="header-role" class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">Administrator</span>
+                                </a>
+
+                                <a href="javascript:;" class="collapse-icon flex flex-none rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary ltr:ml-2 rtl:mr-2 dark:bg-dark/40 dark:text-[#d0d2d6] dark:hover:bg-dark/60 dark:hover:text-primary lg:hidden" @click="$store.app.toggleSidebar()">
+                                    <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 7L4 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        <path d="M20 17L4 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div x-data="header" class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-[#d0d2d6] sm:flex-1 ltr:sm:ml-0 sm:rtl:mr-0 lg:space-x-2">
+                                <div class="sm:ltr:mr-auto sm:rtl:ml-auto" x-data="{ search: false }" @click.outside="search = false">
+                                    <form class="absolute inset-x-0 top-1/2 z-10 mx-4 hidden -translate-y-1/2 sm:relative sm:top-0 sm:mx-0 sm:block sm:translate-y-0" :class="{'!block' : search}" @submit.prevent="search = false">
+                                        <div class="relative">
+                                            <input type="text" class="peer form-input bg-gray-100 placeholder:tracking-widest ltr:pl-9 ltr:pr-9 rtl:pr-9 rtl:pl-9 sm:bg-transparent ltr:sm:pr-4 rtl:sm:pl-4" placeholder="Search...">
+                                            <button type="button" class="absolute inset-0 h-9 w-9 appearance-none peer-focus:text-primary ltr:right-auto rtl:left-auto">
+                                                <svg class="mx-auto" width="16" height="16" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="11.5" cy="11.5" r="9.5" stroke="currentColor" stroke-width="1.5" opacity="0.5"></circle>
+                                                    <path d="M18.5 18.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                                </svg>
+                                            </button>
+                                            <button type="button" class="absolute top-1/2 block -translate-y-1/2 hover:opacity-80 ltr:right-2 rtl:left-2 sm:hidden" @click="search = false">
+                                                <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle opacity="0.5" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                                                    <path d="M14.5 9.50002L9.5 14.5M9.49998 9.5L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <button type="button" class="search_btn rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 dark:bg-dark/40 dark:hover:bg-dark/60 sm:hidden" @click="search = ! search">
+                                        <svg class="mx-auto h-4.5 w-4.5 dark:text-[#d0d2d6]" width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="11.5" cy="11.5" r="9.5" stroke="currentColor" stroke-width="1.5" opacity="0.5"></circle>
+                                            <path d="M18.5 18.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div>
+                                    <a href="javascript:;" x-cloak="" x-show="$store.app.theme === 'light'" href="javascript:;" class="flex items-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60" @click="$store.app.toggleTheme('dark')">
+                                        <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"></circle>
+                                            <path d="M12 2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path d="M12 20V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path d="M4 12L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path d="M22 12L20 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path opacity="0.5" d="M19.7778 4.22266L17.5558 6.25424" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path opacity="0.5" d="M4.22217 4.22266L6.44418 6.25424" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path opacity="0.5" d="M6.44434 17.5557L4.22211 19.7779" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path opacity="0.5" d="M19.7778 19.7773L17.5558 17.5551" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        </svg>
+                                    </a>
+                                    <a href="javascript:;" x-cloak="" x-show="$store.app.theme === 'dark'" href="javascript:;" class="flex items-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60" @click="$store.app.toggleTheme('system')">
+                                        <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21.0672 11.8568L20.4253 11.469L21.0672 11.8568ZM12.1432 2.93276L11.7553 2.29085V2.29085L12.1432 2.93276ZM21.25 12C21.25 17.1086 17.1086 21.25 12 21.25V22.75C17.9371 22.75 22.75 17.9371 22.75 12H21.25ZM12 21.25C6.89137 21.25 2.75 17.1086 2.75 12H1.25C1.25 17.9371 6.06294 22.75 12 22.75V21.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75V1.25C6.06294 1.25 1.25 6.06294 1.25 12H2.75ZM15.5 14.25C12.3244 14.25 9.75 11.6756 9.75 8.5H8.25C8.25 12.5041 11.4959 15.75 15.5 15.75V14.25ZM20.4253 11.469C19.4172 13.1373 17.5882 14.25 15.5 14.25V15.75C18.1349 15.75 20.4407 14.3439 21.7092 12.2447L20.4253 11.469ZM9.75 8.5C9.75 6.41182 10.8627 4.5828 12.531 3.57467L11.7553 2.29085C9.65609 3.5593 8.25 5.86509 8.25 8.5H9.75ZM12 2.75C11.9115 2.75 11.8077 2.71008 11.7324 2.63168C11.6686 2.56527 11.6538 2.50244 11.6503 2.47703C11.6461 2.44587 11.6482 2.35557 11.7553 2.29085L12.531 3.57467C13.0342 3.27065 13.196 2.71398 13.1368 2.27627C13.0754 1.82126 12.7166 1.25 12 1.25V2.75ZM21.7092 12.2447C21.6444 12.3518 21.5541 12.3539 21.523 12.3497C21.4976 12.3462 21.4347 12.3314 21.3683 12.2676C21.2899 12.1923 21.25 12.0885 21.25 12H22.75C22.75 11.2834 22.1787 10.9246 21.7237 10.8632C21.286 10.804 20.7293 10.9658 20.4253 11.469L21.7092 12.2447Z" fill="currentColor"></path>
+                                        </svg>
+                                    </a>
+                                    <a href="javascript:;" x-cloak="" x-show="$store.app.theme === 'system'" href="javascript:;" class="flex items-center rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60" @click="$store.app.toggleTheme('light')">
+                                        <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 9C3 6.17157 3 4.75736 3.87868 3.87868C4.75736 3 6.17157 3 9 3H15C17.8284 3 19.2426 3 20.1213 3.87868C21 4.75736 21 6.17157 21 9V14C21 15.8856 21 16.8284 20.4142 17.4142C19.8284 18 18.8856 18 17 18H7C5.11438 18 4.17157 18 3.58579 17.4142C3 16.8284 3 15.8856 3 14V9Z" stroke="currentColor" stroke-width="1.5"></path>
+                                            <path opacity="0.5" d="M22 21H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path opacity="0.5" d="M15 15H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                                <div class="dropdown" x-data="dropdown" @click.outside="open = false">
+                                    <a href="javascript:;" class="relative block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60" @click="toggle">
+                                        <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19.0001 9.7041V9C19.0001 5.13401 15.8661 2 12.0001 2C8.13407 2 5.00006 5.13401 5.00006 9V9.7041C5.00006 10.5491 4.74995 11.3752 4.28123 12.0783L3.13263 13.8012C2.08349 15.3749 2.88442 17.5139 4.70913 18.0116C9.48258 19.3134 14.5175 19.3134 19.291 18.0116C21.1157 17.5139 21.9166 15.3749 20.8675 13.8012L19.7189 12.0783C19.2502 11.3752 19.0001 10.5491 19.0001 9.7041Z" stroke="currentColor" stroke-width="1.5"></path>
+                                            <path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <path d="M12 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        </svg>
+
+                                        <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
+                                            <span class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"></span>
+                                            <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
+                                        </span>
+                                    </a>
+                                    <ul x-cloak="" x-show="open" x-transition="" x-transition.duration.300ms="" class="top-11 w-[300px] divide-y !py-0 text-dark ltr:-right-2 rtl:-left-2 dark:divide-white/10 dark:text-white-dark sm:w-[350px]">
+                                        <li>
+                                            <div class="flex items-center justify-between px-4 py-2 font-semibold hover:!bg-transparent">
+                                                <h4 class="text-lg">Notification</h4>
+                                                <template x-if="notifications.length">
+                                                    <span class="badge bg-primary/80" x-text="notifications.length + 'New'"></span>
+                                                </template>
+                                            </div>
+                                        </li>
+                                        <template x-for="notification in notifications">
+                                            <li class="dark:text-white-light/90">
+                                                <div class="group flex items-center px-4 py-2" @click.self="toggle">
+                                                    <div class="grid place-content-center rounded">
+                                                        <div class="relative h-12 w-12">
+                                                            <img class="h-12 w-12 rounded-full object-cover" :src="`assets/images/${notification.profile}`" alt="image">
+                                                            <span class="absolute right-[6px] bottom-0 block h-2 w-2 rounded-full bg-success"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-auto ltr:pl-3 rtl:pr-3">
+                                                        <div class="ltr:pr-3 rtl:pl-3">
+                                                            <h6 x-html="notification.message"></h6>
+                                                            <span class="block text-xs font-normal dark:text-gray-500" x-text="notification.time"></span>
+                                                        </div>
+                                                        <button type="button" class="text-neutral-300 opacity-0 hover:text-danger group-hover:opacity-100 ltr:ml-auto rtl:mr-auto" @click="removeNotification(notification.id)">
+                                                            <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <circle opacity="0.5" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                                                                <path d="M14.5 9.50002L9.5 14.5M9.49998 9.5L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </template>
+                                        <template x-if="notifications.length">
+                                            <li>
+                                                <div class="p-4">
+                                                    <button class="btn btn-primary btn-small block w-full" @click="toggle">Read All Notifications</button>
+                                                </div>
+                                            </li>
+                                        </template>
+                                        <template x-if="!notifications.length">
+                                            <li>
+                                                <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
+                                                    <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
+                                                        <svg width="40" height="40" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path opacity="0.5" d="M20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10Z" fill="currentColor"></path>
+                                                            <path d="M10 4.25C10.4142 4.25 10.75 4.58579 10.75 5V11C10.75 11.4142 10.4142 11.75 10 11.75C9.58579 11.75 9.25 11.4142 9.25 11V5C9.25 4.58579 9.58579 4.25 10 4.25Z" fill="currentColor"></path>
+                                                            <path d="M10 15C10.5523 15 11 14.5523 11 14C11 13.4477 10.5523 13 10 13C9.44772 13 9 13.4477 9 14C9 14.5523 9.44772 15 10 15Z" fill="currentColor"></path>
+                                                        </svg>
+                                                    </div>
+                                                    No data available.
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                                <div class="dropdown flex-shrink-0" x-data="dropdown" @click.outside="open = false">
+                                    <a href="javascript:;" class="group relative" @click="toggle()">
+                                        <span><img class="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src="assets/images/logo.jpg" alt="image"></span>
+                                    </a>
+                                    <ul x-cloak="" x-show="open" x-transition="" x-transition.duration.300ms="" class="top-11 w-[230px] !py-0 font-semibold text-dark ltr:right-0 rtl:left-0 dark:text-white-dark dark:text-white-light/90">
+                                        <li>
+                                            <div class="flex items-center px-4 py-4">
+                                                <div class="flex-none">
+                                                    <img class="h-10 w-10 rounded-md object-cover" src="assets/images/logo.jpg" alt="image">
+                                                </div>
+                                                <div class="truncate ltr:pl-4 rtl:pr-4">
+                                                    <h4 class="text-base">
+                                                        StarCode Kh<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>
+                                                    </h4>
+                                                    <a class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white" href="javascript:;">starcodekh@gmail.com</a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <a href="profile.php" class="dark:hover:text-white" @click="toggle">
+                                                <svg class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"></circle>
+                                                    <path opacity="0.5" d="M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z" stroke="currentColor" stroke-width="1.5"></path>
+                                                </svg>
+                                                Profile</a>
+                                        </li>
+                                        <li>
+                                            <a href="chat.php" class="dark:hover:text-white" @click="toggle">
+                                                <svg class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M2 12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12C22 15.7712 22 17.6569 20.8284 18.8284C19.6569 20 17.7712 20 14 20H10C6.22876 20 4.34315 20 3.17157 18.8284C2 17.6569 2 15.7712 2 12Z" stroke="currentColor" stroke-width="1.5"></path>
+                                                    <path d="M6 8L8.1589 9.79908C9.99553 11.3296 10.9139 12.0949 12 12.0949C13.0861 12.0949 14.0045 11.3296 15.8411 9.79908L18 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                                </svg>
+                                                Inbox</a>
+                                        </li>
+                                        <li class="border-t border-white-light dark:border-white-light/10">
+                                            <a href="logout.php" class="!py-3 text-danger" @click="toggle">
+                                                <svg class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2" width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path opacity="0.5" d="M17 9.00195C19.175 9.01406 20.3529 9.11051 21.1213 9.8789C22 10.7576 22 12.1718 22 15.0002V16.0002C22 18.8286 22 20.2429 21.1213 21.1215C20.2426 22.0002 18.8284 22.0002 16 22.0002H8C5.17157 22.0002 3.75736 22.0002 2.87868 21.1215C2 20.2429 2 18.8286 2 16.0002L2 15.0002C2 12.1718 2 10.7576 2.87868 9.87889C3.64706 9.11051 4.82497 9.01406 7 9.00195" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                                    <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                                Sign Out
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <!-- end header section -->
+
+                <div class="animate__animated p-6" :class="[$store.app.animation]">
+                    <div x-data="finance">
+                        <ul class="flex space-x-2 rtl:space-x-reverse">
+                            <li>
+                                <a href="javascript:;" class="text-primary hover:underline">Dashboard</a>
+                            </li>
+                        </ul>
+                        <div class="pt-5">
+                            <div class="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-4">
+                                <!-- Temperature -->
+                                <div id="temperature-card" class="panel">
+                                    <div class="flex justify-between">
+                                        <div class="text-md font-semibold ltr:mr-1 rtl:ml-1">Temperature</div>
+                                        <i class="fas fa-temperature-high weather-icon"></i>
+                                    </div>
+                                    <div class="mt-5">
+                                        <h6 class="mb-0"><span id="current-temp"></span> °C</h6>
+                                        <small>Feels like: <span id="feels-like"></span>°C</small>
+                                    </div>
+                                </div>
+
+                                <!-- Precipitation -->
+                                <div id="precipitation-card" class="panel">
+                                    <div class="flex justify-between">
+                                        <div class="text-md font-semibold ltr:mr-1 rtl:ml-1">Precipitation</div>
+                                        <i class="fas fa-cloud-rain weather-icon"></i>
+                                    </div>
+                                    <div class="mt-5">
+                                        <h6 class="mb-0"><span id="precipitation"></span> mm/hr</h6>
+                                        <small>Last hour</small>
+                                    </div>
+                                </div>
+
+                                <!-- Humidity -->
+                                <div id="humidity-card" class="panel">
+                                    <div class="flex justify-between">
+                                        <div class="text-md font-semibold ltr:mr-1 rtl:ml-1">Humidity</div>
+                                        <i class="fas fa-tint weather-icon"></i>
+                                    </div>
+                                    <div class="mt-5">
+                                        <h6 class="mb-0"><span id="humidity"></span> %</h6>
+                                        <small>Dew point: <span id="dew-point"></span>°C</small>
+                                    </div>
+                                </div>
+
+                                <!-- Wind -->
+                                <div id="wind-card" class="panel">
+                                    <div class="flex justify-between">
+                                        <div class="text-md font-semibold ltr:mr-1 rtl:ml-1">Wind</div>
+                                        <i class="fas fa-wind weather-icon"></i>
+                                    </div>
+                                    <div class="mt-5">
+                                        <div class="flex items-center">
+                                            <span id="wind-direction"></span> 
+                                            <span id="wind-speed" class="ml-1"></span> km/h
+                                        </div>
+                                        <small>Gusts: <span id="wind-gust"></span> km/h</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="pt-5 overflow-x-hidden">
+                            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                                <div class="panel h-full w-full">
+                                    <div class="alert alert-danger flex items-center mb-3 p-2">
+                                        <i class="fa fa-exclamation-triangle me-3 text-xl"></i>
+                                        <div>
+                                            <h6 class="mb-0 font-semibold">AUTOMATED WARNING SYSTEM</h6>
+                                            <small class="text-gray-300">Last updated: <span id="weather-update-time">Loading...</span></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="alert-level-banner" style="display: none;">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div>
+                                                <span id="alert-type" class="font-bold"></span>
+                                                <span id="alert-location"></span>
+                                            </div>
+                                            <span id="alert-level" class="badge"></span>
+                                        </div>
+                                        <p id="alert-message" class="mt-2 mb-0 text-sm"></p>
+                                        
+                                        <!-- Enhanced warning system -->
+                                    <div id="rainfall-warning" class="mt-4">
+                                        <h6 class="font-bold mb-2">24-HR RAINFALL FORECAST</h6>
+
+                                        <!-- Rainfall threshold indicator -->
+                                        <div class="threshold-indicator">
+                                            <div class="threshold-label">24-Hour Total:</div>
+                                            <div class="threshold-bar">
+                                                <div id="threshold-fill" class="threshold-fill intensity-low" style="width: 0%"></div>
+                                            </div>
+                                            <div class="threshold-value"><span id="rainfall-value">0</span> mm</div>
+                                        </div>
+
+                                        <!-- Threshold markers -->
+                                        <div class="flex justify-between text-xs mt-1">
+                                            <div>0mm</div>
+                                            <div>50mm</div>
+                                            <div>100mm</div>
+                                            <div>200mm</div>
+                                        </div>
+
+                                        <!-- Warning levels -->
+                                        <div id="warning-levels" class="mt-3">
+                                            <div class="warning-level warning-moderate" style="display: none;" data-threshold="30">
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                <span class="warning-text">MODERATE WARNING (30-100mm)</span>
+                                            </div>
+                                            <div class="warning-level warning-high" style="display: none;" data-threshold="100">
+                                                <i class="fas fa-exclamation-circle mr-2"></i>
+                                                <span class="warning-text">HIGH WARNING (100-200mm)</span>
+                                            </div>
+                                            <div class="warning-level warning-critical pulse-alert" style="display: none;" data-threshold="200">
+                                                <i class="fas fa-radiation mr-2"></i>
+                                                <span class="warning-text">CRITICAL WARNING (>200mm)</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Affected barangays -->
+                                        <div id="affected-barangays" class="mt-3" style="display: none;">
+                                            <h6 class="font-bold mb-2">AFFECTED BARANGAYS:</h6>
+                                            <div class="barangay-list">
+                                                <div id="barangay-list-content"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Automated Suspension System Recommendations -->
+                                        <div id="suspension-recommendations" class="mt-4" style="display: none; font-weight: 700 !important;">
+                                            <h6 class="font-bold mb-3 text-red-600">
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                AUTOMATED SUSPENSION RECOMMENDATIONS
+                                            </h6>
+
+                                            <!-- Recommendations Row -->
+                                            <div class="recommendations-row flex flex-wrap gap-3 mb-4">
+                                                <!-- Class Suspension Recommendations -->
+                                                <div id="class-suspension" class="recommendation-card bg-yellow-50 border-l-4 border-yellow-400 p-3 flex-1 min-w-0" style="display: none;">
+                                                    <div class="flex items-center mb-2">
+                                                        <i class="fas fa-school text-yellow-600 mr-2"></i>
+                                                        <strong class="text-yellow-800 text-sm">CLASS SUSPENSION</strong>
+                                                    </div>
+                                                    <div id="class-suspension-details" class="text-xs text-yellow-700"></div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-yellow-500 text-white px-2 py-1 rounded text-xs">EDUCATION</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Work Suspension Recommendations -->
+                                                <div id="work-suspension" class="recommendation-card bg-orange-50 border-l-4 border-orange-400 p-3 flex-1 min-w-0" style="display: none;">
+                                                    <div class="flex items-center mb-2">
+                                                        <i class="fas fa-briefcase text-orange-600 mr-2"></i>
+                                                        <strong class="text-orange-800 text-sm">WORK SUSPENSION</strong>
+                                                    </div>
+                                                    <div id="work-suspension-details" class="text-xs text-orange-700"></div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-orange-500 text-white px-2 py-1 rounded text-xs">GOVERNMENT</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Business Operation Recommendations -->
+                                                <div id="business-recommendations" class="recommendation-card bg-blue-50 border-l-4 border-blue-400 p-3 flex-1 min-w-0" style="display: none;">
+                                                    <div class="flex items-center mb-2">
+                                                        <i class="fas fa-building text-blue-600 mr-2"></i>
+                                                        <strong class="text-blue-800 text-sm">BUSINESS GUIDANCE</strong>
+                                                    </div>
+                                                    <div id="business-recommendations-details" class="text-xs text-blue-700"></div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-blue-500 text-white px-2 py-1 rounded text-xs">BUSINESS</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Emergency Response Actions -->
+                                                <div id="emergency-actions" class="recommendation-card bg-red-50 border-l-4 border-red-400 p-3 flex-1 min-w-0" style="display: none;">
+                                                    <div class="flex items-center mb-2">
+                                                        <i class="fas fa-ambulance text-red-600 mr-2"></i>
+                                                        <strong class="text-red-800 text-sm">EMERGENCY RESPONSE</strong>
+                                                    </div>
+                                                    <div id="emergency-actions-details" class="text-xs text-red-700"></div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-red-500 text-white px-2 py-1 rounded text-xs">DISASTER</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel h-full w-full">
+                                    <div class="weather-charts-container">
+                                        <div class="chart-title">Weather Statistics</div>
+                                        <div class="chart-nav">
+                                            <button class="chart-nav-btn active" onclick="showChart('rainfall')">Rainfall</button>
+                                            <button class="chart-nav-btn" onclick="showChart('temperature')">Temperature</button>
+                                            <button class="chart-nav-btn" onclick="showChart('humidity')">Humidity</button>
+                                            <button class="chart-nav-btn" onclick="showChart('wind')">Wind</button>
+                                        </div>
+                                        <div class="chart-container">
+                                            <canvas id="rainfallChart"></canvas>
+                                            <canvas id="temperatureChart" style="display: none;"></canvas>
+                                            <canvas id="humidityChart" style="display: none;"></canvas>
+                                            <canvas id="windChart" style="display: none;"></canvas>
+                                        </div>
+                                        <div class="chart-legend" id="chart-legend">Last 24 hours</div>
+
+                                        <!-- Actionable Recommendations for Vulnerable Areas -->
+                                        <div id="vulnerable-areas-actions" class="mt-4" style="display: none; font-weight: 700 !important;">
+                                            <h6 class="font-bold mb-2">
+                                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                                Actionable Recommendations for Vulnerable Areas
+                                            </h6>
+                                            <div id="vulnerable-areas-list" class="space-y-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel h-full w-full">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h6 class="chart-title">5-Day Weather Forecast</h6>
+                                            <div class="custom-dropdown">
+                                                <button class="custom-dropdown-toggle" type="button" id="locationDropdown">
+                                                    <span id="current-location">Naval, Biliran</span>
+                                                    <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                                                </button>
+                                                <div class="custom-dropdown-menu" id="locationDropdownMenu">
+                                                    <button class="custom-dropdown-item" data-location="Naval,PH">Naval, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Almeria,PH">Almeria, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Kawayan,PH">Kawayan, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Biliran,PH">Biliran, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Culaba,PH">Culaba, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Cabucgayan,PH">Cabucgayan, Biliran</button>
+                                                    <button class="custom-dropdown-item" data-location="Caibiran,PH">Caibiran, Biliran</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="weather-forecast-container" class="forecast-container-fixed">
+                                            <div class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-2">Loading weather data...</p>
+                                            </div>
+                                        </div>
+                                </div>
+                                <div class="panel h-full w-full">
+                                    <div style="min-height: 50vh; width: 100%;">
+                                            <iframe src="https://embed.windy.com/embed2.html?lat=11.56056&lon=124.3975&zoom=5&level=surface&overlay=satellite"
+                                                width="100%"
+                                                frameborder="0"
+                                                style="border:0; min-height: 655px; height: 100%;"
+                                                allowfullscreen>
+                                            </iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="panel h-full w-full">
+                            <div style="min-height: 70vh; width: 100%;">
+                                <iframe src="https://www.rainviewer.com/hurricane-map.html?loc=17.9042,117.8888,4.1090850674385635&layer=sat&hu=1&ts=2" width="100%" frameborder="0" style="border:0;height:70vh;" allowfullscreen></iframe>
+                            </div>
+                            <br>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #58e7fa;"></span>
+                                        <span>Tropical Depression (38 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #5899fa;"></span>
+                                        <span>Tropical Storm (39-73 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #fffe54;"></span>
+                                        <span>Category 1 Hurricane (74-95 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #f8cd46;"></span>
+                                        <span>Category 2 Hurricane (96-110 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #ee6f2d;"></span>
+                                        <span>Category 3 Hurricane (111-129 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #ff0000;"></span>
+                                        <span>Category 4 Hurricane (130-156 mph)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: #a4000f;"></span>
+                                        <span>Category 5 Hurricane (157 mph or higher)</span>
+                                    </div>
+                                </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rain Alarm (hidden audio element) -->
+            <audio id="rain-alarm" preload="auto">
+                <source src="assets/alarm.wav" type="audio/mpeg">
+            </audio>
+            <audio id="rain-alarm-high" preload="auto">
+                <source src="assets/war siren sound #war #siren #soundeffects.mp3" type="audio/mpeg">
+            </audio>
+            <audio id="rain-alarm-critical" preload="auto">
+                <source src="assets/alarm.wav" type="audio/mpeg">
+            </audio>
+        </div>
+        </div>
+        <script src="assets/js/highlight.min.js"></script>
+        <script src="assets/js/permission.js"></script>
+        <script src="assets/js/alpine-collaspe.min.js"></script>
+        <script src="assets/js/alpine-persist.min.js"></script>
+        <script defer="" src="assets/js/alpine-ui.min.js"></script>
+        <script defer="" src="assets/js/alpine-focus.min.js"></script>
+        <script defer="" src="assets/js/alpine.min.js"></script>
+        <script src="assets/js/custom.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+// Weather Dashboard Configuration - Updated for Open Meteo API
+const WEATHER_CONFIG = {
+    API_KEY: null, // Open Meteo doesn't require API key
+    BASE_URL: "https://api.open-meteo.com/v1",
+    DEFAULT_LOCATION: "11.5833,124.4500", // Naval, Biliran coordinates (updated to Naval)
+    REFRESH_INTERVAL: 30 * 60 * 1000, // 30 minutes
+    MAX_RETRIES: 3,
+    RETRY_DELAY: 3000 // 3 seconds
+};
+
+// Location mapping for municipalities in Biliran
+const LOCATION_COORDINATES = {
+    "Naval,PH": { latitude: 11.5833, longitude: 124.4500 },
+    "Almeria,PH": { latitude: 11.6203, longitude: 124.3817 },
+    "Kawayan,PH": { latitude: 11.6894, longitude: 124.3592 },
+    "Biliran,PH": { latitude: 11.4667, longitude: 124.4833 },
+    "Culaba,PH": { latitude: 11.6575, longitude: 124.5425 },
+    "Cabucgayan,PH": { latitude: 11.4711, longitude: 124.5747 },
+    "Caibiran,PH": { latitude: 11.5717, longitude: 124.5822 }
+};
+
+// Rainfall thresholds for warnings (values in millimeters over 24 hours)
+const RAINFALL_THRESHOLDS = {
+    // Moderate threshold should be a meaningful rainfall amount (e.g. 30 mm)
+    MODERATE: 30,    // ~30mm - Localized flooding possible
+    HIGH: 1.0,       // 100mm - Numerous flooding events likely
+    CRITICAL: 200    // 200mm - Widespread severe flooding expected
+};
+
+// Sample data for barangays in different municipalities
+const BARANGAYS_BY_MUNICIPALITY = {
+    "Naval,PH": [
+        "Agpangi",
+        "Anislagan",
+        "Atipolo",
+        "Borac",
+        "Cabungaan",
+        "Calumpang",
+        "Capiñahan",
+        "Caraycaray",
+        "Catmon",
+        "Haguikhikan",
+        "Imelda",
+        "Larrazabal",
+        "Libertad",
+        "Libtong",
+        "Lico",
+        "Lucsoon",
+        "Mabini",
+        "Padre Inocentes Garcia",
+        "Padre Sergio Eamiguel",
+        "Sabang",
+        "San Pablo",
+        "Santissimo Rosario Poblacion",
+        "Santo Niño",
+        "Talustusan",
+        "Villa Caneja",
+        "Villa Consuelo"
+    ],
+    "Almeria,PH": [
+        "Igang", "Jamorawon", "Lo-ok", "Matanggo", 
+        "Pili", "Poblacion", "Pulang Bato", "Salangi", "Talahid", "Tabunan", "Tamarindo", "Caucab"
+    ],
+    "Kawayan,PH": [
+        "Baganito", "Bulalacao", "Balacson", "Balite", "Bilwang", "Burabod", "Buyo", "Kansanok", 
+        "Mada-o", "Mapuyo", "Masagaosao", "Masagongsong", "Poblacion", "Inasuyan", "San Lorenzo",
+        "Tabunan North", "Tubig Ginoo", "Tucdao", "Ungale"
+    ],
+    "Biliran,PH": [
+        "Bato", "Burabod", "Busali", "Hugpa", "Julita", "Sanggalang",
+        "Canila", "Pinangumhan", "San Isidro", "San Roque", "Villa Enage"
+    ],
+    "Culaba,PH": [
+        "Acaban", "Bacolod", "Binongaan", "Binongtoan", "Bool Central", "Bool East", 
+        "Bool West", "Calipayan", "Culaba Central", "Guindapunan", "Habuhab", "Looc",
+        "Marvel", "Patag", "Pinamihagan", "Salvacion", "San Roque", "Virginia"
+    ],
+    "Cabucgayan,PH": [
+        "Balaquid", "Baso", "Bunga", "Caanibongan", "Casiawan", 
+        "Esperanza", "Langgao", "Libertad", "Looc", "Magbangon", "Pawikan", "Salawad", "Talibong"
+    ],
+    "Caibiran,PH": [
+        "Alegria", "Asug", "Bari-is", "Binohangan", "Cabalquinto", "Cabibihan", "Caulangohan",
+        "Kawayanon", "Looc", "Manlabang", "Maurang", "Palanay", "Palengke", "Tomalistis", "Union",
+        "Uson", "Victory", "Villa Vecinta"
+    ]
+};
+
+// Global variables
+let currentLocation = WEATHER_CONFIG.DEFAULT_LOCATION;
+let currentMunicipality = "Naval,PH"; // Default municipality
+let weatherCharts = {};
+let retryCount = 0;
+let hourlyRainfallData = Array(24).fill(0); // Store rainfall for last 24 hours
+let last24HourTotal = 0;
+let lastAlarmLevel = 0; // Track the last rainfall level that triggered the alarm
+
+// Load user data and update the dropdown
+async function loadUserData() {
+    try {
+        const res = await fetch('api/users/current.php');
+        const data = await res.json();
+        if (data.success) {
+            Alpine.store('user', data.data);
+            updateUserDropdown(data.data);
+            updateSidebarRole(data.data.role);
+        }
+    } catch (err) {
+        console.error('Failed to load user data:', err);
+    }
+}
+
+// Update the user dropdown with fetched data
+function updateUserDropdown(user) {
+    const dropdown = document.querySelector('.dropdown.flex-shrink-0');
+    if (dropdown) {
+        const triggerImg = dropdown.querySelector('a img');
+        const dropdownImg = dropdown.querySelector('ul li img');
+        const nameSpan = dropdown.querySelector('h4');
+        const emailA = dropdown.querySelector('ul li a');
+
+        if (triggerImg) triggerImg.src = user.profile_picture || 'assets/images/logo.jpg';
+        if (dropdownImg) dropdownImg.src = user.profile_picture || 'assets/images/logo.jpg';
+        if (nameSpan) {
+            nameSpan.innerHTML = `${escapeHtml(user.first_name)} ${escapeHtml(user.last_name)}<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>`;
+        }
+        if (emailA) emailA.textContent = user.email;
+    }
+}
+
+// Update the sidebar role display
+function updateSidebarRole(role) {
+    const sidebarRoleElement = document.getElementById('sidebar-role');
+    if (sidebarRoleElement) {
+        // Capitalize the first letter of the role
+        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+        sidebarRoleElement.textContent = displayRole;
+    }
+
+    // Also update the header role display
+    const headerRoleElement = document.getElementById('header-role');
+    if (headerRoleElement) {
+        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+        headerRoleElement.textContent = displayRole;
+    }
+}
+
+// DOM Ready Handler with enhanced initialization
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserData();
+
+    // Initialize custom dropdown
+    initCustomDropdown();
+
+    // Initialize warning system
+    initWarningSystem();
+
+    // Fallback check if DOM is already loaded
+    if (document.readyState === 'complete') {
+        initializeWeatherDashboard();
+    } else {
+        window.addEventListener('load', initializeWeatherDashboard);
+    }
+});
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, function (s) {
+        return ({
+            '&': '&amp;',
+            '<': '<',
+            '>': '>',
+            '"': '"',
+            "'": '&#39;'
+        })[s];
+    });
+}
+
+/**
+ * Initialize custom dropdown functionality
+ */
+function initCustomDropdown() {
+    const dropdownToggle = document.getElementById('locationDropdown');
+    const dropdownMenu = document.getElementById('locationDropdownMenu');
+    
+    // Toggle dropdown on button click
+    dropdownToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Handle location selection
+    const dropdownItems = dropdownMenu.querySelectorAll('.custom-dropdown-item');
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const location = this.getAttribute('data-location');
+            changeLocation(location);
+            dropdownMenu.classList.remove('show');
+        });
+    });
+}
+
+/**
+ * Initialize the warning system
+ */
+function initWarningSystem() {
+    // Set up initial state
+    updateRainfallIndicator(0);
+}
+
+/**
+ * Initializes the weather dashboard with retry mechanism
+ */
+function initializeWeatherDashboard() {
+    console.log("Initializing weather dashboard...");
+    
+    try {
+        // Initialize charts first
+        if (!initCharts()) {
+            throw new Error("Failed to initialize charts");
+        }
+        
+        // Start data loading with retry mechanism
+        retryCount = 0;
+        attemptLoad();
+        
+        // Set up periodic refresh
+        setInterval(fetchWeatherData, WEATHER_CONFIG.REFRESH_INTERVAL);
+    } catch (error) {
+        console.error("Dashboard initialization failed:", error);
+        showErrorState("Dashboard initialization failed. Please refresh the page.");
+    }
+}
+
+/**
+ * Attempts to load weather data with retries
+ */
+function attemptLoad() {
+    fetchWeatherData().then(success => {
+        if (!success && retryCount < WEATHER_CONFIG.MAX_RETRIES) {
+            retryCount++;
+            console.log(`Retrying in ${WEATHER_CONFIG.RETRY_DELAY/1000} seconds... (Attempt ${retryCount})`);
+            setTimeout(attemptLoad, WEATHER_CONFIG.RETRY_DELAY * retryCount);
+        }
+    });
+}
+
+// ----------------------
+// WEATHER DATA FUNCTIONS (updated for Open Meteo API)
+// ----------------------
+
+/**
+ * Fetches weather data from Open Meteo API
+ */
+async function fetchWeatherData() {
+    showLoadingState();
+    
+    try {
+        console.log("Fetching weather data for:", currentLocation);
+        
+        // Parse coordinates
+        let lat, lon;
+        if (currentLocation.includes(',')) {
+            [lat, lon] = currentLocation.split(',').map(coord => parseFloat(coord.trim()));
+        } else {
+            // Handle municipality names
+            const coords = LOCATION_COORDINATES[currentLocation];
+            if (!coords) {
+                throw new Error(`Unknown location: ${currentLocation}`);
+            }
+            lat = coords.latitude;
+            lon = coords.longitude;
+        }
+        
+        // Build Open Meteo API URL
+        const apiUrl = `${WEATHER_CONFIG.BASE_URL}/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum&timezone=auto&forecast_days=5`;
+        
+        const response = await fetch(apiUrl, {
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.reason || 'Open Meteo API error');
+        }
+        
+        processWeatherData(data);
+        return true;
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        handleWeatherError(error);
+        return false;
+    }
+}
+
+/**
+ * Shows loading state with timeout warning
+ */
+function showLoadingState() {
+    const forecastContainer = document.getElementById('weather-forecast-container');
+    if (forecastContainer) {
+        forecastContainer.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading weather data...</p>
+                <small class="text-gray-500">This may take a moment</small>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Processes weather data from Open Meteo API
+ */
+function processWeatherData(data) {
+    if (!data || !data.current) {
+        throw new Error("Invalid weather data structure");
+    }
+    
+    console.log("Processing weather data:", data);
+    
+    // Process current weather
+    updateCurrentWeather(data.current, data.timezone);
+    
+    // Process forecast
+    if (data.daily) {
+        updateForecast(data);
+    } else {
+        console.warn("No forecast data available");
+    }
+    
+    // Calculate 24-hour rainfall total
+    calculate24HourRainfall(data);
+    
+    // Update rainfall warning system
+    updateRainfallWarningSystem();
+}
+
+/**
+ * Calculates the total rainfall over the last 24 hours
+ */
+function calculate24HourRainfall(data) {
+    // Reset the total
+    last24HourTotal = 0;
+    
+    // Check if we have hourly precipitation data
+    if (data.hourly && data.hourly.precipitation) {
+        const now = new Date();
+        const currentHour = now.getHours();
+        
+        // Get precipitation for last 24 hours
+        const hourlyPrecip = data.hourly.precipitation;
+        const hourlyTime = data.hourly.time;
+        
+        // Find the index for current hour and sum last 24 hours
+        for (let i = 0; i < hourlyTime.length; i++) {
+            const hourTime = new Date(hourlyTime[i]);
+            const hoursDiff = (now - hourTime) / (1000 * 60 * 60);
+            
+            if (hoursDiff >= 0 && hoursDiff <= 24) {
+                last24HourTotal += hourlyPrecip[i] || 0;
+            }
+        }
+    }
+    
+    // If no hourly data, use daily precipitation
+    if (last24HourTotal === 0 && data.daily && data.daily.precipitation_sum) {
+        last24HourTotal = data.daily.precipitation_sum[0] || 0;
+    }
+    
+    console.log("24-hour rainfall total:", last24HourTotal);
+}
+
+/**
+ * Updates the rainfall warning system based on current data
+ */
+function updateRainfallWarningSystem() {
+    updateRainfallIndicator(last24HourTotal);
+
+    // Show appropriate warning level
+    document.querySelectorAll('.warning-level').forEach(warning => {
+        warning.style.display = 'none';
+    });
+
+    // Get current location name for warnings
+    const locationName = getCurrentLocationName();
+
+    // Play appropriate alarm based on threshold level and it's a new threshold
+    playRainfallAlarm(last24HourTotal);
+
+    if (last24HourTotal >= RAINFALL_THRESHOLDS.CRITICAL) {
+        const criticalWarning = document.querySelector('.warning-critical');
+        criticalWarning.style.display = 'flex';
+        // Update warning text with location
+        const warningText = criticalWarning.querySelector('.warning-text');
+        if (warningText) {
+            warningText.innerHTML = `<strong>CRITICAL FLOODING ALERT</strong> for ${locationName}: Extreme rainfall detected. Immediate evacuation recommended for landslides and flood-prone areas.`;
+        }
+        showAffectedBarangays(true);
+        showSuspensionRecommendations('critical');
+    } else if (last24HourTotal >= RAINFALL_THRESHOLDS.HIGH) {
+        const highWarning = document.querySelector('.warning-high');
+        highWarning.style.display = 'flex';
+        // Update warning text with location
+        const warningText = highWarning.querySelector('.warning-text');
+        if (warningText) {
+            warningText.innerHTML = `<strong>FLOOD WARNING</strong> for ${locationName}: Heavy rainfall expected. Prepare for possible flooding in low-lying areas.`;
+        }
+        showAffectedBarangays(true);
+        showSuspensionRecommendations('high');
+    } else if (last24HourTotal >= RAINFALL_THRESHOLDS.MODERATE) {
+        const moderateWarning = document.querySelector('.warning-moderate');
+        moderateWarning.style.display = 'flex';
+        // Update warning text with location
+        const warningText = moderateWarning.querySelector('.warning-text');
+        if (warningText) {
+            warningText.innerHTML = `<strong>FLOOD ADVISORY</strong> for ${locationName}: Moderate rainfall expected. Stay alert in flood-prone areas.`;
+        }
+        showAffectedBarangays(true);
+        showSuspensionRecommendations('moderate');
+    } else {
+        showAffectedBarangays(false);
+        hideSuspensionRecommendations();
+    }
+
+    // Always show the alert banner if there's any rainfall
+    const alertBanner = document.getElementById('alert-level-banner');
+    if (last24HourTotal > 0) {
+        alertBanner.style.display = 'block';
+
+        // Update alert message based on rainfall level with location
+        let alertType, alertLevel, alertMessage;
+
+        if (last24HourTotal >= RAINFALL_THRESHOLDS.CRITICAL) {
+            alertType = `CRITICAL RAINFALL WARNING - ${locationName}`;
+            alertLevel = 'Critical';
+            alertMessage = `<strong>Extreme rainfall (${last24HourTotal.toFixed(1)}mm in 24 hours) in ${locationName}. Widespread incidents of severe flooding and landslides expected.</strong>`;
+        } else if (last24HourTotal >= RAINFALL_THRESHOLDS.HIGH) {
+            alertType = `HIGH RAINFALL WARNING - ${locationName}`;
+            alertLevel = 'High';
+            alertMessage = `<strong>Heavy rainfall (${last24HourTotal.toFixed(1)}mm in 24 hours) in ${locationName}. Numerous flooding events are likely, especially in areas that are urbanized, low lying, or near rivers.</strong>`;
+        } else if (last24HourTotal >= RAINFALL_THRESHOLDS.MODERATE) {
+            alertType = `MODERATE RAINFALL ADVISORY - ${locationName}`;
+            alertLevel = 'Moderate';
+            alertMessage = `<strong>Moderate rainfall (${last24HourTotal.toFixed(1)}mm in 24 hours) in ${locationName}. Localized flooding is possible mainly in areas that are urbanized, low lying, or near rivers.</strong>`;
+        } else {
+            alertType = `LIGHT RAINFALL NOTICE - ${locationName}`;
+            alertLevel = 'Light';
+            alertMessage = `<strong>Light rainfall (${last24HourTotal.toFixed(1)}mm in 24 hours) in ${locationName}. No significant impacts expected.</strong>`;
+        }
+
+        setElementText('alert-type', alertType);
+        setElementText('alert-level', alertLevel);
+        setElementInnerHTML('alert-message', alertMessage);
+
+        // Set alert level color
+        const alertLevelElement = document.getElementById('alert-level');
+        alertLevelElement.className = 'badge ' + (
+            last24HourTotal >= RAINFALL_THRESHOLDS.CRITICAL ? 'bg-danger' :
+            last24HourTotal >= RAINFALL_THRESHOLDS.HIGH ? 'bg-warning' :
+            last24HourTotal >= RAINFALL_THRESHOLDS.MODERATE ? 'bg-info' : 'bg-primary'
+        );
+
+        alertBanner.className = `alert ${last24HourTotal >= RAINFALL_THRESHOLDS.CRITICAL ? 'bg-danger' :
+                                last24HourTotal >= RAINFALL_THRESHOLDS.HIGH ? 'bg-warning' :
+                                last24HourTotal >= RAINFALL_THRESHOLDS.MODERATE ? 'bg-info' : 'bg-primary'} text-white`;
+    } else {
+        alertBanner.style.display = 'none';
+    }
+}
+
+/**
+ * Gets the current location name for display in warnings
+ */
+function getCurrentLocationName() {
+    // Extract location name from currentLocation
+    let locationName = "Naval"; // Default
+    
+    if (currentLocation.includes(',')) {
+        // Handle coordinate format
+        const municipality = Object.keys(LOCATION_COORDINATES).find(key => {
+            const coords = LOCATION_COORDINATES[key];
+            return `${coords.latitude},${coords.longitude}` === currentLocation;
+        });
+        
+        if (municipality) {
+            locationName = municipality.split(',')[0]; // Remove ",PH" suffix
+        }
+    } else {
+        // Handle municipality name format
+        locationName = currentLocation.split(',')[0]; // Remove ",PH" suffix if present
+    }
+    
+    return locationName;
+}
+
+/**
+ * Updates the rainfall indicator
+ */
+function updateRainfallIndicator(rainfall) {
+    const thresholdFill = document.getElementById('threshold-fill');
+    const rainfallValue = document.getElementById('rainfall-value');
+    
+    rainfallValue.textContent = rainfall.toFixed(1);
+    
+    // Calculate percentage (capped at 250mm for visualization)
+    const percentage = Math.min((rainfall / 250) * 100, 100);
+    thresholdFill.style.width = `${percentage}%`;
+    
+    // Update color based on intensity
+    thresholdFill.className = 'threshold-fill ' + (
+        rainfall >= RAINFALL_THRESHOLDS.CRITICAL ? 'intensity-extreme' :
+        rainfall >= RAINFALL_THRESHOLDS.HIGH ? 'intensity-high' :
+        rainfall >= RAINFALL_THRESHOLDS.MODERATE ? 'intensity-moderate' : 'intensity-low'
+    );
+}
+
+/**
+ * Shows affected barangays based on rainfall level
+ */
+function showAffectedBarangays(show) {
+    const affectedBarangays = document.getElementById('affected-barangays');
+
+    if (show) {
+        affectedBarangays.style.display = 'block';
+
+        // Get barangays for current municipality using the stored municipality key
+        const barangays = BARANGAYS_BY_MUNICIPALITY[currentMunicipality] || [];
+
+        // Update the location in the barangay section header
+        const locationName = getCurrentLocationName();
+        const barangayHeader = document.querySelector('#affected-barangays h6');
+        if (barangayHeader) {
+            barangayHeader.textContent = `AFFECTED BARANGAYS IN ${locationName.toUpperCase()}:`;
+        }
+
+        // Determine how many barangays to show based on rainfall intensity
+        let barangayCount = 0;
+        let severityLevel = '';
+
+        if (last24HourTotal >= RAINFALL_THRESHOLDS.CRITICAL) {
+            barangayCount = Math.min(barangays.length, 30); // Show all or up to 30 for critical
+            severityLevel = 'CRITICAL';
+        } else if (last24HourTotal >= RAINFALL_THRESHOLDS.HIGH) {
+            barangayCount = Math.min(barangays.length, 30); // Show up to 30 for high
+            severityLevel = 'HIGH';
+        } else if (last24HourTotal >= RAINFALL_THRESHOLDS.MODERATE) {
+            barangayCount = Math.min(barangays.length, 30); // Show up to 30 for moderate
+            severityLevel = 'MODERATE';
+        }
+
+        // Update header with severity level
+        if (barangayHeader) {
+            barangayHeader.textContent = `${severityLevel} WARNING - AFFECTED BARANGAYS IN ${locationName.toUpperCase()}:`;
+        }
+
+        // Display the barangays
+        const barangayListContent = document.getElementById('barangay-list-content');
+        barangayListContent.innerHTML = '';
+
+        if (barangayCount > 0) {
+            for (let i = 0; i < barangayCount; i++) {
+                const barangayItem = document.createElement('div');
+                barangayItem.className = 'barangay-item text-sm text-white mb-1';
+                barangayItem.innerHTML = `<i class="fas fa-map-marker-alt mr-2 text-red-500"></i>${barangays[i]}`;
+                barangayListContent.appendChild(barangayItem);
+            }
+        } else {
+            // No barangays available for this municipality
+            const noBarangaysItem = document.createElement('div');
+            noBarangaysItem.className = 'barangay-item text-sm text-gray-400 mb-1';
+            noBarangaysItem.innerHTML = `<i class="fas fa-info-circle mr-2"></i>No barangay data available for ${locationName}`;
+            barangayListContent.appendChild(noBarangaysItem);
+        }
+    } else {
+        affectedBarangays.style.display = 'none';
+    }
+}
+
+/**
+ * Shows automated suspension recommendations based on hazard severity
+ */
+function showSuspensionRecommendations(severity) {
+    const suspensionContainer = document.getElementById('suspension-recommendations');
+    const locationName = getCurrentLocationName();
+
+    // Hide all recommendation cards first
+    document.querySelectorAll('.recommendation-card').forEach(card => {
+        card.style.display = 'none';
+    });
+
+    // Show the container
+    suspensionContainer.style.display = 'block';
+
+    if (severity === 'critical') {
+        // Show all recommendations for critical level
+        showClassSuspension(true, locationName);
+        showWorkSuspension(true, locationName);
+        showBusinessRecommendations(true, locationName);
+        showEmergencyActions(true, locationName);
+        showVulnerableAreasActions(locationName, 'critical');
+    } else if (severity === 'high') {
+        // Show all recommendations for high level
+        showClassSuspension(true, locationName);
+        showWorkSuspension(true, locationName);
+        showBusinessRecommendations(true, locationName);
+        showEmergencyActions(true, locationName);
+        showVulnerableAreasActions(locationName, 'high');
+    } else if (severity === 'moderate') {
+        // Show all recommendations for moderate level
+        showClassSuspension(true, locationName);
+        showWorkSuspension(true, locationName);
+        showBusinessRecommendations(true, locationName);
+        showEmergencyActions(true, locationName);
+        showVulnerableAreasActions(locationName, 'moderate');
+    }
+}
+
+
+/**
+ * Hides all suspension recommendations
+ */
+function hideSuspensionRecommendations() {
+    const suspensionContainer = document.getElementById('suspension-recommendations');
+    suspensionContainer.style.display = 'none';
+
+    document.querySelectorAll('.recommendation-card').forEach(card => {
+        card.style.display = 'none';
+    });
+
+    // Also hide and clear vulnerable areas recommendations when suspensions are hidden
+    const vulnerableContainer = document.getElementById('vulnerable-areas-actions');
+    if (vulnerableContainer) {
+        vulnerableContainer.style.display = 'none';
+    }
+    const vulnerableList = document.getElementById('vulnerable-areas-list');
+    if (vulnerableList) vulnerableList.innerHTML = '';
+}
+
+/**
+ * Shows class suspension recommendations
+ */
+function showClassSuspension(show, locationName) {
+    const classSuspension = document.getElementById('class-suspension');
+    if (show) {
+        classSuspension.style.display = 'block';
+        const details = document.getElementById('class-suspension-details');
+        details.innerHTML = `
+            <div class="mb-2"><strong>Immediate Action Required:</strong></div>
+            <ul class="list-disc list-inside space-y-1">
+                <li>All schools in ${locationName} should suspend classes immediately</li>
+                <li>Include preschool, elementary, secondary, and tertiary levels</li>
+                <li>Alternative learning arrangements should be prepared</li>
+                <li>Parents should be notified through SMS and local announcements</li>
+                <li>School facilities should be secured against potential flooding</li>
+            </ul>
+        `;
+    } else {
+        classSuspension.style.display = 'none';
+    }
+}
+
+/**
+ * Shows work suspension recommendations
+ */
+function showWorkSuspension(show, locationName) {
+    const workSuspension = document.getElementById('work-suspension');
+    if (show) {
+        workSuspension.style.display = 'block';
+        const details = document.getElementById('work-suspension-details');
+        details.innerHTML = `
+            <div class="mb-2"><strong>Government and Private Sector:</strong></div>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Suspend non-essential government services in ${locationName}</li>
+                <li>Private companies should implement work-from-home policies</li>
+                <li>Essential services (healthcare, emergency response) remain operational</li>
+                <li>Local government offices should activate emergency operations center</li>
+                <li>Public transportation should be monitored and potentially suspended</li>
+            </ul>
+        `;
+    } else {
+        workSuspension.style.display = 'none';
+    }
+}
+
+/**
+ * Shows business operation recommendations
+ */
+function showBusinessRecommendations(show, locationName) {
+    const businessRecs = document.getElementById('business-recommendations');
+    if (show) {
+        businessRecs.style.display = 'block';
+        const details = document.getElementById('business-recommendations-details');
+        details.innerHTML = `
+            <div class="mb-2"><strong>Business Operations Guidance:</strong></div>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Non-essential businesses in ${locationName} should close temporarily</li>
+                <li>Essential businesses (pharmacies, groceries) should prepare for limited operations</li>
+                <li>Implement employee safety protocols and evacuation plans</li>
+                <li>Monitor weather updates and be prepared to close if conditions worsen</li>
+                <li>Coordinate with local authorities for business continuity planning</li>
+            </ul>
+        `;
+    } else {
+        businessRecs.style.display = 'none';
+    }
+}
+
+/**
+ * Shows emergency response actions
+ */
+function showEmergencyActions(show, locationName) {
+    const emergencyActions = document.getElementById('emergency-actions');
+    if (show) {
+        emergencyActions.style.display = 'block';
+        const details = document.getElementById('emergency-actions-details');
+        details.innerHTML = `
+            <div class="mb-2"><strong>Critical Emergency Response:</strong></div>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Activate municipal disaster response teams immediately</li>
+                <li>Prepare evacuation centers in ${locationName} for potential displacement</li>
+                <li>Deploy emergency response vehicles and personnel</li>
+                <li>Establish communication hotlines for affected residents</li>
+                <li>Coordinate with provincial and national disaster agencies</li>
+                <li>Monitor river levels and landslide-prone areas continuously</li>
+            </ul>
+        `;
+    } else {
+        emergencyActions.style.display = 'none';
+    }
+}
+
+/**
+ * Shows actionable recommendations for vulnerable areas
+ */
+function showVulnerableAreasActions(locationName, severity) {
+    const vulnerableContainer = document.getElementById('vulnerable-areas-actions');
+    const vulnerableAreasList = document.getElementById('vulnerable-areas-list');
+    if (vulnerableContainer) vulnerableContainer.style.display = 'block';
+    if (vulnerableAreasList) vulnerableAreasList.innerHTML = '';
+
+    // Define color schemes for each area type
+    const colorSchemes = {
+        blue: {
+            bg: "bg-blue-50",
+            border: "border-blue-500",
+            icon: "text-blue-600",
+            badge: "bg-blue-100 text-blue-800",
+            text: "text-blue-700"
+        },
+        cyan: {
+            bg: "bg-cyan-50",
+            border: "border-cyan-500",
+            icon: "text-cyan-600",
+            badge: "bg-cyan-100 text-cyan-800",
+            text: "text-cyan-700"
+        },
+        purple: {
+            bg: "bg-purple-50",
+            border: "border-purple-500",
+            icon: "text-purple-600",
+            badge: "bg-purple-100 text-purple-800",
+            text: "text-purple-700"
+        },
+        green: {
+            bg: "bg-green-50",
+            border: "border-green-500",
+            icon: "text-green-600",
+            badge: "bg-green-100 text-green-800",
+            text: "text-green-700"
+        },
+        amber: {
+            bg: "bg-amber-50",
+            border: "border-amber-500",
+            icon: "text-amber-600",
+            badge: "bg-amber-100 text-amber-800",
+            text: "text-amber-700"
+        }
+    };
+
+    // Define vulnerable areas based on typical flood-prone locations in Biliran
+    const vulnerableAreas = [
+        {
+            name: "Low-lying coastal barangays",
+            risk: "High flood risk from storm surges and heavy rainfall",
+            icon: "fas fa-water",
+            priority: "critical",
+            theme: "blue"
+        },
+        {
+            name: "Riverside communities",
+            risk: "Flash flooding from overflowing rivers and creeks",
+            icon: "fas fa-stream",
+            priority: "high",
+            theme: "cyan"
+        },
+        {
+            name: "Urban areas near drainage systems",
+            risk: "Poor drainage leading to localized flooding",
+            icon: "fas fa-city",
+            priority: "high",
+            theme: "purple"
+        },
+        {
+            name: "Mountainous barangays",
+            risk: "Landslide risk in elevated areas with heavy rainfall",
+            icon: "fas fa-mountain",
+            priority: "critical",
+            theme: "green"
+        },
+        {
+            name: "Areas with poor infrastructure",
+            risk: "Limited access to emergency services and evacuation routes",
+            icon: "fas fa-road",
+            priority: "moderate",
+            theme: "amber"
+        }
+    ];
+
+    // Create a grid container for better layout
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+    vulnerableAreas.forEach(area => {
+        const areaItem = document.createElement('div');
+
+        // Get color scheme based on area theme
+        const colors = colorSchemes[area.theme] || colorSchemes.blue;
+
+        areaItem.className = `vulnerable-area-item ${colors.bg} p-4 rounded-lg border-l-4 ${colors.border} shadow-sm hover:shadow-md transition-shadow duration-200`;
+
+        let actionText = '';
+        let actionIcon = '';
+        let actionColor = '';
+
+        if (severity === 'critical') {
+            actionText = `<strong class="text-red-700">URGENT:</strong> Immediate evacuation recommended. Emergency response teams should prioritize this area.`;
+            actionIcon = 'fas fa-exclamation-triangle';
+            actionColor = 'text-red-700';
+        } else if (severity === 'high') {
+            actionText = `<strong class="text-orange-700">HIGH PRIORITY:</strong> Prepare for evacuation. Monitor water levels closely and be ready to move to higher ground.`;
+            actionIcon = 'fas fa-exclamation-circle';
+            actionColor = 'text-orange-700';
+        } else {
+            actionText = `<strong class="text-blue-700">MONITOR:</strong> Stay alert and prepare emergency kits. Follow local government instructions.`;
+            actionIcon = 'fas fa-info-circle';
+            actionColor = 'text-blue-700';
+        }
+
+        areaItem.innerHTML = `
+            <div class="panel pb-12 flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                    <i class="${area.icon} ${colors.icon} text-xl mt-1"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-sm leading-tight">${area.name}</h4>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colors.badge}">
+                            <i class="${actionIcon} mr-1"></i>
+                            ${severity.toUpperCase()}
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold mb-3 leading-relaxed">${area.risk}</p>
+                    <div class="flex items-start space-x-2">
+                        <i class="${actionIcon} ${colors.text} text-sm mt-0.5 flex-shrink-0"></i>
+                        <p class="text-sm ${colors.text} leading-relaxed">${actionText}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        gridContainer.appendChild(areaItem);
+    });
+
+    vulnerableAreasList.appendChild(gridContainer);
+}
+
+/**
+ * Handles weather data errors with user feedback
+ */
+function handleWeatherError(error) {
+    console.error('Weather data error:', error);
+    
+    const errorMessage = error.message.includes('Failed to fetch') 
+        ? "Network error. Check your internet connection."
+        : error.message || 'Unable to load weather data';
+    
+    showErrorState(errorMessage);
+    
+    // Set default values when API fails
+    setElementText('precipitation', '0.0');
+    setElementText('current-temp', '--');
+    setElementText('humidity', '--');
+    setElementText('wind-speed', '--');
+}
+
+/**
+ * Shows error state with retry button
+ */
+function showErrorState(message = "Failed to load weather data") {
+    const container = document.getElementById('weather-forecast-container') || 
+                    document.querySelector('.content');
+    
+    if (container) {
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fa fa-exclamation-triangle me-2"></i>
+                ${message}
+                <div class="mt-2">
+                    <button onclick="retryLoading()">
+                        <i type"button" class="btn btn-warning btn-sm fa fa-sync-alt"> Retry</i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Retry loading function exposed to UI
+ */
+function retryLoading() {
+    retryCount = 0;
+    attemptLoad();
+}
+
+// ----------------------
+// WEATHER DISPLAY FUNCTIONS (updated for Open Meteo data structure)
+// ----------------------
+
+/**
+ * Updates current weather display with Open Meteo data
+ */
+function updateCurrentWeather(data, timezone) {
+    if (!data) {
+        console.error('Invalid weather data received:', data);
+        return;
+    }
+
+    updateTimestamp();
+    updateWeatherCards(data);
+}
+
+/**
+ * Updates the weather update timestamp
+ */
+function updateTimestamp() {
+    const now = new Date();
+    const timestampElement = document.getElementById('weather-update-time');
+    if (timestampElement) {
+        timestampElement.textContent = now.toLocaleString();
+    }
+}
+
+/**
+ * Updates all weather cards with current data from Open Meteo
+ */
+function updateWeatherCards(data) {
+    // Temperature
+    setElementText('current-temp', Math.round(data.temperature_2m));
+    setElementText('feels-like', Math.round(data.temperature_2m)); // Open Meteo doesn't provide feels like
+    
+    // Humidity
+    setElementText('humidity', Math.round(data.relative_humidity_2m));
+    setElementText('dew-point', Math.round(data.temperature_2m - (100 - data.relative_humidity_2m)/5));
+    
+    // Precipitation
+    setElementText('precipitation', (data.precipitation || 0).toFixed(1));
+    
+    // Wind
+    updateWindDisplay(data);
+}
+
+/**
+ * Updates wind display with direction and speed from Open Meteo
+ */
+function updateWindDisplay(data) {
+    const windDirection = getWindDirection(parseInt(data.wind_direction_10m));
+    const windDirectionElement = document.getElementById('wind-direction');
+    
+    if (windDirectionElement) {
+        windDirectionElement.textContent = windDirection;
+        const windArrow = document.createElement('i');
+        windArrow.className = 'fas fa-arrow-up wind-direction';
+        windArrow.style.transform = `rotate(${data.wind_direction_10m}deg)`;
+        windDirectionElement.prepend(windArrow);
+    }
+    
+    setElementText('wind-speed', Math.round(data.wind_speed_10m));
+    setElementText('wind-gust', Math.round(data.wind_speed_10m * 1.2)); // Estimate gust as 20% higher
+}
+
+/**
+ * Updates 5-day forecast display with Open Meteo data
+ */
+function updateForecast(data) {
+    const forecastContainer = document.getElementById('weather-forecast-container');
+    if (!forecastContainer) {
+        console.error("Forecast container not found");
+        return;
+    }
+    
+    if (!data || !data.daily || data.daily.time.length === 0) {
+        forecastContainer.innerHTML = `
+            <div class="alert alert-warning">
+                No forecast data available. Please try again later.
+            </div>
+        `;
+        return;
+    }
+
+    let forecastHTML = '<div class="forecast-container">';
+    
+    for (let i = 0; i < 5; i++) {
+        const date = new Date(data.daily.time[i]);
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const maxTemp = Math.round(data.daily.temperature_2m_max[i]);
+        const minTemp = Math.round(data.daily.temperature_2m_min[i]);
+        const precipitation = data.daily.precipitation_sum[i] || 0;
+        
+        forecastHTML += `
+            <div class="forecast-card">
+                <div class="forecast-date">${dayName}</div>
+                <div class="forecast-day">${date.getDate()}</div>
+                <i class="fas ${getWeatherIconFromPrecipitation(precipitation, maxTemp, minTemp)} forecast-icon ${getWeatherIconColorFromPrecipitation(precipitation, maxTemp)}"></i>
+                <div class="forecast-temp">${maxTemp}°</div>
+                <div class="forecast-temp-range">
+                    <span class="temp-high">${maxTemp}°</span>
+                    <span class="temp-low">${minTemp}°</span>
+                </div>
+                <div class="forecast-desc">${precipitation > 0 ? precipitation.toFixed(1) + 'mm rain' : 'Clear'}</div>
+                <div class="forecast-details">
+                    <div class="detail-item">
+                        <div class="detail-value">${precipitation.toFixed(1)}mm</div>
+                        <div class="detail-label">Rain</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">${Math.round((maxTemp + minTemp) / 2)}°</div>
+                        <div class="detail-label">Avg</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    forecastHTML += '</div>';
+    forecastContainer.innerHTML = forecastHTML;
+
+    // Add hover effects and animations
+    const forecastCards = forecastContainer.querySelectorAll('.forecast-card');
+    forecastCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        });
+    });
+    
+    updateCharts(data);
+}
+
+// ----------------------
+// CHART FUNCTIONS (updated for Open Meteo data)
+// ----------------------
+
+/**
+ * Initializes all weather charts with validation
+ */
+function initCharts() {
+    console.log("Initializing charts...");
+    
+    try {
+        const chartOptions = getCommonChartOptions();
+        
+        // Verify all chart containers exist
+        const requiredCharts = ['rainfallChart', 'temperatureChart', 'humidityChart', 'windChart'];
+        const missingCharts = requiredCharts.filter(id => !document.getElementById(id));
+        
+        if (missingCharts.length > 0) {
+            throw new Error(`Missing chart containers: ${missingCharts.join(', ')}`);
+        }
+        
+        // Rainfall Chart
+        weatherCharts.rainfall = createChart('rainfallChart', {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Rainfall (mm)',
+                    data: [],
+                    backgroundColor: '#F1C900FF',
+                    borderColor: '#000304FF',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                ...chartOptions,
+                scales: {
+                    ...chartOptions.scales,
+                    y: { ...chartOptions.scales.y, beginAtZero: true }
+                }
+            }
+        });
+        
+        // Temperature Chart
+        weatherCharts.temperature = createChart('temperatureChart', {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: [],
+                    borderColor: '#f87171',
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Humidity Chart
+        weatherCharts.humidity = createChart('humidityChart', {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Humidity (%)',
+                    data: [],
+                    borderColor: '#4ade80',
+                    backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Wind Chart
+        weatherCharts.wind = createChart('windChart', {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Wind Speed (km/h)',
+                    data: [],
+                    borderColor: '#60a5fa',
+                    backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Show rainfall chart by default
+        showChart('rainfall');
+        
+        return true;
+    } catch (error) {
+        console.error("Chart initialization failed:", error);
+        showErrorState("Failed to initialize charts. Please refresh the page.");
+        return false;
+    }
+}
+
+/**
+ * Returns common chart options
+ */
+function getCommonChartOptions() {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: '#a6a6a6' }
+            },
+            y: {
+                grid: { color: 'rgba(255,255,255,0.1)', drawBorder: false },
+                ticks: { color: '#a6a6a6' }
+            }
+        },
+        elements: { point: { radius: 0 } }
+    };
+}
+
+/**
+ * Creates a new chart instance
+ */
+function createChart(elementId, config) {
+    const ctx = document.getElementById(elementId);
+    if (!ctx) {
+        console.error(`Chart canvas not found: ${elementId}`);
+        return null;
+    }
+    return new Chart(ctx.getContext('2d'), config);
+}
+
+/**
+ * Updates all charts with Open Meteo weather data
+ */
+function updateCharts(data) {
+    if (!data || !data.hourly || data.hourly.time.length === 0) {
+        console.error('Invalid hourly data received');
+        return;
+    }
+
+    const hourlyData = data.hourly;
+    const timeLabels = hourlyData.time.slice(0, 24).map(time => {
+        const date = new Date(time);
+        return date.getHours() + ':00';
+    }).reverse();
+    
+    // Update rainfall chart
+    updateChartData('rainfall', timeLabels, hourlyData.precipitation.slice(0, 24).reverse());
+    
+    // Update temperature chart
+    updateChartData('temperature', timeLabels, hourlyData.temperature_2m.slice(0, 24).map(temp => Math.round(temp)).reverse());
+    
+    // Update humidity chart
+    updateChartData('humidity', timeLabels, hourlyData.relative_humidity_2m.slice(0, 24).map(hum => Math.round(hum)).reverse());
+    
+    // Update wind chart
+    updateChartData('wind', timeLabels, hourlyData.wind_speed_10m.slice(0, 24).map(speed => Math.round(speed)).reverse());
+}
+
+/**
+ * Updates specific chart data
+ */
+function updateChartData(chartName, labels, data) {
+    if (weatherCharts[chartName]) {
+        weatherCharts[chartName].data.labels = labels;
+        weatherCharts[chartName].data.datasets[0].data = data;
+        weatherCharts[chartName].update();
+    }
+}
+
+/**
+ * Shows specific chart and hides others
+ */
+function showChart(chartName) {
+    // Hide all charts
+    document.querySelectorAll('.chart-container canvas').forEach(canvas => {
+        canvas.style.display = 'none';
+    });
+    
+    // Show selected chart
+    const chartElement = document.getElementById(`${chartName}Chart`);
+    if (chartElement) chartElement.style.display = 'block';
+    
+    // Update active button
+    if (event && event.target) {
+        document.querySelectorAll('.chart-nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+    
+    // Update legend
+    const legendText = {
+        'rainfall': 'Rainfall in last 24 hours (mm)',
+        'temperature': 'Temperature variation in last 24 hours (°C)',
+        'humidity': 'Humidity variation in last 24 hours (%)',
+        'wind': 'Wind speed in last 24 hours (km/h)'
+    };
+    
+    setElementText('chart-legend', legendText[chartName] || 'Weather data');
+}
+
+// ----------------------
+// UTILITY FUNCTIONS (updated for Open Meteo)
+// ----------------------
+
+/**
+ * Converts wind degrees to compass direction
+ */
+function getWindDirection(degrees) {
+    const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    const index = Math.round((degrees % 360) / 22.5);
+    return directions[index % 16];
+}
+
+/**
+ * Gets weather icon based on comprehensive weather conditions
+ */
+function getWeatherIconFromPrecipitation(precipitation, maxTemp = null, minTemp = null) {
+    // Heavy rain conditions
+    if (precipitation > 20) return 'fa-cloud-showers-heavy';
+    if (precipitation > 10) return 'fa-cloud-rain';
+
+    // Moderate rain
+    if (precipitation > 5) return 'fa-cloud-rain';
+
+    // Light rain or drizzle
+    if (precipitation > 1) return 'fa-cloud-sun-rain';
+
+    // No precipitation - determine based on temperature
+    if (precipitation === 0) {
+        if (maxTemp !== null) {
+            // Hot and dry
+            if (maxTemp > 35) return 'fa-sun';
+            // Warm and clear
+            if (maxTemp > 30) return 'fa-sun';
+            // Pleasant weather
+            if (maxTemp > 25) return 'fa-sun';
+            // Mild weather
+            if (maxTemp > 20) return 'fa-cloud-sun';
+            // Cool weather
+            if (maxTemp > 15) return 'fa-cloud';
+            // Cold weather
+            return 'fa-cloud';
+        }
+        // Default clear sky
+        return 'fa-sun';
+    }
+
+    // Very light precipitation
+    return 'fa-cloud-sun';
+}
+
+/**
+ * Gets weather icon color based on comprehensive conditions
+ */
+function getWeatherIconColorFromPrecipitation(precipitation, maxTemp = null) {
+    // Heavy precipitation - blue/cyan tones
+    if (precipitation > 20) return 'text-cyan-400';
+    if (precipitation > 10) return 'text-blue-400';
+
+    // Moderate precipitation
+    if (precipitation > 5) return 'text-blue-500';
+
+    // Light precipitation
+    if (precipitation > 1) return 'text-blue-300';
+
+    // No precipitation - temperature-based colors
+    if (precipitation === 0 && maxTemp !== null) {
+        if (maxTemp > 35) return 'text-yellow-400'; // Hot
+        if (maxTemp > 30) return 'text-orange-400'; // Warm
+        if (maxTemp > 25) return 'text-yellow-500'; // Pleasant
+        if (maxTemp > 20) return 'text-gray-400'; // Mild
+        if (maxTemp > 15) return 'text-gray-500'; // Cool
+        return 'text-blue-300'; // Cold
+    }
+
+    // Default for very light conditions
+    return 'text-blue-200';
+}
+
+/**
+ * Gets precipitation value from weather data
+ */
+function getPrecipitation(data) {
+    return data.precipitation || 0;
+}
+
+/**
+ * Changes location and fetches new weather data
+ */
+function changeLocation(location) {
+    // Handle both coordinate strings and municipality names
+    if (LOCATION_COORDINATES[location]) {
+        const coords = LOCATION_COORDINATES[location];
+        currentLocation = `${coords.latitude},${coords.longitude}`;
+        currentMunicipality = location; // Store the municipality key
+    } else {
+        currentLocation = location;
+        currentMunicipality = location; // Fallback
+    }
+
+    updateLocationDisplay(location);
+    fetchWeatherData();
+}
+
+/**
+ * Updates the displayed location name
+ */
+function updateLocationDisplay(location) {
+    const locationElement = document.getElementById('current-location');
+    if (locationElement) {
+        // Extract municipality name from location string
+        let locationName = location;
+        if (location.includes(',')) {
+            locationName = location.split(',')[0];
+        }
+        locationElement.textContent = `${locationName}, Biliran`;
+    }
+}
+
+
+
+/**
+ * Sets text content of an element if it exists
+ */
+function setElementText(elementId, text) {
+    const element = document.getElementById(elementId);
+    if (element) element.textContent = text;
+}
+
+/**
+ * Sets inner HTML of an element if it exists
+ */
+function setElementInnerHTML(elementId, html) {
+    const element = document.getElementById(elementId);
+    if (element) element.innerHTML = html;
+}
+
+/**
+ * Plays rainfall alarm based on threshold level
+ * Moderate (30mm): assets/alarm.wav
+ * High (100mm): assets/war siren sound #war #siren #soundeffects.mp3
+ * Critical (200mm): assets/Nuclear Alarm Siren.mp3
+ */
+function playRainfallAlarm(rainfallTotal) {
+    const currentLevel = rainfallTotal >= RAINFALL_THRESHOLDS.CRITICAL ? 3 :
+                        rainfallTotal >= RAINFALL_THRESHOLDS.HIGH ? 2 :
+                        rainfallTotal >= RAINFALL_THRESHOLDS.MODERATE ? 1 : 0;
+
+    if (currentLevel > lastAlarmLevel) {
+        try {
+            let alarmElement = null;
+            if (currentLevel === 1) {
+                alarmElement = document.getElementById('rain-alarm'); // Moderate: alarm.wav
+            } else if (currentLevel === 2) {
+                alarmElement = document.getElementById('war-alarm'); // High: war siren
+            } else if (currentLevel === 3) {
+                alarmElement = document.getElementById('nuclear-alarm'); // Critical: nuclear siren
+            }
+
+            if (alarmElement) {
+                // Always reset to start for repeated triggers
+                alarmElement.currentTime = 0;
+                alarmElement.play();
+                lastAlarmLevel = currentLevel; // Update the last alarm level
+            }
+        } catch (e) { console.warn('Alarm failed:', e); }
+    } else if (currentLevel < lastAlarmLevel) {
+        // Reset alarm level if rainfall drops below thresholds
+        lastAlarmLevel = currentLevel;
+    }
+}
+</script>
+    </body>
+</html>

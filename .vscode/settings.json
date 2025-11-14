@@ -2,6 +2,8 @@
     "CodeGPT.apiKey": "Gemini CLI",
     "cSpell.words": [
         "animatetransform",
-        "attributename"
+        "attributename",
+        "loginsystem",
+        "Swal"
     ]
 }
