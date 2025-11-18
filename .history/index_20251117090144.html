@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Mapping S</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-bg {
+            background: linear-gradient(-45deg, #1e3a8a, #1e40af, #3b82f6, #0ea5e9);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><path d="M0 50 Q 25 40, 50 50 T 100 50" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="2"/></svg>');
+            opacity: 0.3;
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .tech-bg {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            position: relative;
+        }
+
+        .tech-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tech-card:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .map-preview {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(147, 51, 234, 0.9));
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .stats-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: drift 20s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .cta-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            position: relative;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .partner-card {
+            transition: all 0.3s ease;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .icon-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="glassmorphism shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-map-marked-alt text-white text-xl"></i>
+                </div>
+                <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">FTS</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#features" class="nav-link text-gray-700 hover:text-blue-600 font-medium">Features</a>
+                <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 font-medium">About</a>
+                <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.location.href='auth-cover-login.php'" class="px-5 py-2 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition duration-300">Login</button>
+                <button onclick="window.location.href='auth-cover-register.php'" class="btn-primary px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transition duration-300">Register</button>
+                <button class="md:hidden text-gray-700" id="mobile-menu-button">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden bg-white py-4 px-4 shadow-lg" id="mobile-menu">
+            <div class="flex flex-col space-y-4">
+                <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium transition">Features</a>
+                <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition">About</a>
+                <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium transition">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg text-white py-20 md:py-32 relative">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center relative z-10">
+            <div class="md:w-1/2 mb-10 md:mb-0 fade-in-up">
+                <div class="inline-block px-4 py-2 bg-white bg-opacity-20 rounded-full mb-4 backdrop-blur-sm">
+                    <span class="text-sm font-semibold">🚀 Advanced Disaster Monitoring</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">Final Thesis System - Disaster Management Platform</h1>
+                <p class="text-xl mb-8 opacity-90 leading-relaxed">Comprehensive web-based disaster management platform with real-time weather monitoring, hazard visualization, and emergency response coordination for Biliran Province</p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button class="btn-primary px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-opacity-90 transition duration-300 shadow-2xl">
+                        <i class="fas fa-rocket mr-2"></i>Explore Dashboard
+                    </button>
+                    <button class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-play-circle mr-2"></i>Watch Demo
+                    </button>
+                </div>
+                <div class="flex items-center space-x-6 mt-8">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-green-400 mr-2"></i>
+                        <span class="text-sm">ISO Compliant</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-yellow-400 mr-2"></i>
+                        <span class="text-sm">24/7 Monitoring</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-users text-purple-400 mr-2"></i>
+                        <span class="text-sm">1000+ Users</span>
+                    </div>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <div class="map-preview w-full max-w-md h-96 relative overflow-hidden rounded-2xl shadow-2xl float-animation">
+                    <div class="absolute inset-0 flex items-center justify-center p-8">
+                        <div class="text-center">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm icon-pulse">
+                                <i class="fas fa-map-marked-alt text-white text-5xl"></i>
+                            </div>
+                    <h3 class="text-white text-2xl font-bold mb-2">Interactive Risk Visualization</h3>
+                    <p class="text-white opacity-90 text-lg">Heatmaps, choropleth maps, and statistical analysis for comprehensive disaster risk assessment</p>
+                            <div class="mt-6 flex justify-center space-x-2">
+                                <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                                <div class="w-3 h-3 bg-white rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                <div class="w-3 h-3 bg-white rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gradient-to-b from-white to-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider">Powerful Features</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mt-2 mb-4">System Capabilities</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Advanced technologies converge to deliver actionable insights for comprehensive disaster preparedness and rapid response.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-fire text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Heat Mapping</h3>
+                    <p class="text-gray-600 leading-relaxed">Visualize disaster risk concentrations using advanced color gradients to represent intensity across geographic areas with pinpoint accuracy.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-satellite text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Multi-Source Data</h3>
+                    <p class="text-gray-600 leading-relaxed">Seamlessly integrate satellite imagery, drone data, topography maps, and historical records for comprehensive risk assessment.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Risk Forecasting</h3>
+                    <p class="text-gray-600 leading-relaxed">Predict natural disasters with AI-powered analytics based on historical patterns and real-time data with automated decision support.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Early Warning System</h3>
+                    <p class="text-gray-600 leading-relaxed">Deliver clear warnings and actionable recommendations to local government, educational institutions, and business sectors.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-tachometer-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Interactive Dashboards</h3>
+                    <p class="text-gray-600 leading-relaxed">Intuitive visualization platforms with dynamic maps and graphical interfaces designed for all stakeholder levels.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                        <i class="fas fa-database text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">ISO/IEC 25010 Compliant</h3>
+                    <p class="text-gray-600 leading-relaxed">Rigorously evaluated based on international standards for functionality, reliability, security, and usability excellence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 stats-bg text-white relative">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="stat-card rounded-2xl p-8 text-center">
+                    <div class="text-6xl font-bold mb-3">3</div>
+                    <div class="text-2xl font-semibold mb-2">Major Hazards</div>
+                    <p class="opacity-80 text-lg">Landslides, Floods, and Storm Surges</p>
+                </div>
+                <div class="stat-card rounded-2xl p-8 text-center">
+                    <div class="text-6xl font-bold mb-3">8+</div>
+                    <div class="text-2xl font-semibold mb-2">Municipalities</div>
+                    <p class="opacity-80 text-lg">Full Coverage in Biliran Province</p>
+                </div>
+                <div class="stat-card rounded-2xl p-8 text-center">
+                    <div class="text-6xl font-bold mb-3">24/7</div>
+                    <div class="text-2xl font-semibold mb-2">Monitoring</div>
+                    <p class="opacity-80 text-lg">Real-time risk assessment</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section class="py-20 tech-bg relative">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider">Technology</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mt-2 mb-4">Advanced Technology Stack</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Leveraging cutting-edge technologies for accurate disaster risk assessment and visualization.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="tech-card bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <i class="fas fa-globe-americas text-blue-500 text-5xl mb-4"></i>
+                    <h3 class="font-bold text-gray-800 text-lg mb-2">GIS</h3>
+                    <p class="text-sm text-gray-600">Geographic Information System</p>
+                </div>
+                <div class="tech-card bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <i class="fas fa-satellite-dish text-green-500 text-5xl mb-4"></i>
+                    <h3 class="font-bold text-gray-800 text-lg mb-2">Remote Sensing</h3>
+                    <p class="text-sm text-gray-600">Satellite & Drone Data</p>
+                </div>
+                <div class="tech-card bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <i class="fas fa-cloud text-purple-500 text-5xl mb-4"></i>
+                    <h3 class="font-bold text-gray-800 text-lg mb-2">Cloud Computing</h3>
+                    <p class="text-sm text-gray-600">Scalable Infrastructure</p>
+                </div>
+                <div class="tech-card bg-white rounded-2xl p-6 text-center shadow-lg">
+                    <i class="fas fa-brain text-red-500 text-5xl mb-4"></i>
+                    <h3 class="font-bold text-gray-800 text-lg mb-2">Machine Learning</h3>
+                    <p class="text-sm text-gray-600">Predictive Analytics</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider">About the Project</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mt-2 mb-6">Building Resilient Communities</h2>
+                    <p class="text-gray-600 mb-4 text-lg leading-relaxed">This research develops a comprehensive heat mapping framework to visualize and analyze disaster risk concentrations in Biliran Province, with specialized focus on landslides, floods, and storm surges.</p>
+                    <p class="text-gray-600 mb-4 text-lg leading-relaxed">By combining Geographic Information Systems, thermal remote sensing, and socio-ecological data, our system bridges the critical gap between theoretical risk models and real-world readiness.</p>
+                    <p class="text-gray-600 mb-6 text-lg leading-relaxed">The results provide a replicable model for other disaster-prone areas and aid in climate adaptation strategies worldwide.</p>
+                    <button class="btn-primary px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-xl transition duration-300">
+                        <i class="fas fa-book-open mr-2"></i>Read Full Documentation
+                    </button>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Project Objectives</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-gray-700 text-lg">Collect and analyze geospatial data on disaster-prone areas</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-gray-700 text-lg">Develop interactive heat map index visualizing disaster risk levels</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-gray-700 text-lg">Create forecasting system to predict natural disasters</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-gray-700 text-lg">Evaluate system based on ISO/IEC 25010 standards</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 cta-bg text-white relative overflow-hidden">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Enhance Disaster Preparedness?</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-10 opacity-90 leading-relaxed">Join us in building a more resilient Biliran Province with advanced disaster risk monitoring technology.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <button class="btn-primary px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-opacity-90 transition duration-300 shadow-2xl">
+                    <i class="fas fa-calendar-alt mr-2"></i>Request a Demo
+                </button>
+                <button class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-blue-600 transition duration-300">
+                    <i class="fas fa-envelope mr-2"></i>Contact Our Team
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-map-marked-alt text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold">HMDRPA</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed">Advanced geospatial tools for disaster risk assessment and preparedness in Biliran Province.</p>
+                    <div class="flex space-x-4 mt-6">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>Home</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>Features</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Resources</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>API Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>User Guides</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>Research Papers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center"><i class="fas fa-chevron-right text-xs mr-2"></i>Case Studies</a></li>
+                    </ul>
+                </div>
+                <div id="contact">
+                    <h3 class="text-lg font-bold mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mr-3 text-blue-400 mt-1"></i>
+                            <span class="text-gray-400">Biliran Province, Philippines</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mr-3 text-blue-400 mt-1"></i>
+                            <span class="text-gray-400">info@bilirandrms.gov.ph</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone mr-3 text-blue-400 mt-1"></i>
+                            <span class="text-gray-400">+63 123 456 7890</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2023 Biliran Disaster Risk Monitoring System. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe feature cards
+            document.querySelectorAll('.feature-card, .tech-card, .stat-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
